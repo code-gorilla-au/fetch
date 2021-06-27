@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type AxiosOptions struct {
+type Options struct {
 	WithRetry      bool
 	DefaultHeaders map[string]string
 }
@@ -40,8 +40,8 @@ func setDefaultClient() *http.Client {
 	}
 }
 
-func setDefaultAxios() *Axios {
-	return &Axios{
+func setDefaultAxios() *Client {
+	return &Client{
 		retryStrategy: setDefaultRetryStrategy(),
 		client:        setDefaultClient(),
 	}

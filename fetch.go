@@ -13,8 +13,8 @@ var (
 	ErrNoValidRetryStrategy = errors.New("no valid retry strategy")
 )
 
-// axiosClient - basic http client with retry
-type axiosClient interface {
+// client - basic http client with retry
+type client interface {
 	Get(url string, headers map[string]string) (resp *http.Response, err error)
 	Post(url string, body io.Reader, headers map[string]string) (resp *http.Response, err error)
 	Put(url string, body io.Reader, headers map[string]string) (resp *http.Response, err error)
@@ -29,16 +29,16 @@ type httpClient interface {
 	Post(url string, contentType string, body io.Reader) (resp *http.Response, err error)
 }
 
-type Axios struct {
+type Client struct {
 	retryStrategy  []time.Duration
 	client         httpClient
 	defaultHeaders map[string]string
 }
 
-var _ axiosClient = (*Axios)(nil)
+var _ client = (*Client)(nil)
 
-func New(options *AxiosOptions) *Axios {
-	var axios Axios
+func New(options *Options) *Client {
+	var axios Client
 	if options == nil {
 		return setDefaultAxios()
 	}
@@ -50,35 +50,35 @@ func New(options *AxiosOptions) *Axios {
 	return &axios
 }
 
-func (a *Axios) Get(url string, headers map[string]string) (*http.Response, error) {
+func (a *Client) Get(url string, headers map[string]string) (*http.Response, error) {
 	if a.retryStrategy == nil {
 		return call(url, http.MethodGet, bytes.NewReader(nil), a.client, headers)
 	}
 	return callWithRetry(url, http.MethodGet, bytes.NewReader(nil), a.client, a.retryStrategy, headers)
 }
 
-func (a *Axios) Post(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
+func (a *Client) Post(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
 	if a.retryStrategy == nil {
 		return call(url, http.MethodPost, body, a.client, headers)
 	}
 	return callWithRetry(url, http.MethodPost, body, a.client, a.retryStrategy, headers)
 }
 
-func (a *Axios) Put(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
+func (a *Client) Put(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
 	if a.retryStrategy == nil {
 		return call(url, http.MethodPut, body, a.client, headers)
 	}
 	return callWithRetry(url, http.MethodPut, body, a.client, a.retryStrategy, headers)
 }
 
-func (a *Axios) Delete(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
+func (a *Client) Delete(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
 	if a.retryStrategy == nil {
 		return call(url, http.MethodDelete, body, a.client, headers)
 	}
 	return callWithRetry(url, http.MethodDelete, body, a.client, a.retryStrategy, headers)
 }
 
-func (a *Axios) Patch(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
+func (a *Client) Patch(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
 	if a.retryStrategy == nil {
 		return call(url, http.MethodPatch, body, a.client, headers)
 	}

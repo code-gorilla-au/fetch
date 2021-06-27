@@ -120,7 +120,7 @@ func TestAxios_Patch_no_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Axios{
+	axios := &Client{
 		retryStrategy: nil,
 		client:        &m,
 	}
@@ -141,7 +141,7 @@ func TestAxios_Patch_with_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Axios{
+	axios := &Client{
 		retryStrategy: []time.Duration{1 * time.Nanosecond},
 		client:        &m,
 	}
@@ -162,7 +162,7 @@ func TestAxios_Delete_no_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Axios{
+	axios := &Client{
 		retryStrategy: nil,
 		client:        &m,
 	}
@@ -183,7 +183,7 @@ func TestAxios_Delete_with_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Axios{
+	axios := &Client{
 		retryStrategy: []time.Duration{1 * time.Nanosecond},
 		client:        &m,
 	}
@@ -204,7 +204,7 @@ func TestAxios_Put_no_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Axios{
+	axios := &Client{
 		retryStrategy: nil,
 		client:        &m,
 	}
@@ -225,7 +225,7 @@ func TestAxios_Put_with_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Axios{
+	axios := &Client{
 		retryStrategy: []time.Duration{1 * time.Nanosecond},
 		client:        &m,
 	}
@@ -246,7 +246,7 @@ func TestAxios_Get_with_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Axios{
+	axios := &Client{
 		retryStrategy: []time.Duration{1 * time.Nanosecond},
 		client:        &m,
 	}
@@ -266,7 +266,7 @@ func TestAxios_Get_no_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Axios{
+	axios := &Client{
 		retryStrategy: nil,
 		client:        &m,
 	}
@@ -287,7 +287,7 @@ func TestAxios_Post_with_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Axios{
+	axios := &Client{
 		retryStrategy: []time.Duration{1 * time.Nanosecond},
 		client:        &m,
 	}
@@ -308,7 +308,7 @@ func TestAxios_Post_no_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Axios{
+	axios := &Client{
 		retryStrategy: nil,
 		client:        &m,
 	}
@@ -329,7 +329,7 @@ func TestNew_with_default_header(t *testing.T) {
 }
 
 func TestNew_with_options_headers(t *testing.T) {
-	options := AxiosOptions{
+	options := Options{
 		WithRetry: false,
 		DefaultHeaders: map[string]string{
 			"foo": "bar",
@@ -340,7 +340,7 @@ func TestNew_with_options_headers(t *testing.T) {
 }
 
 func TestNew_with_options_no_retry(t *testing.T) {
-	options := AxiosOptions{
+	options := Options{
 		WithRetry: false,
 		DefaultHeaders: map[string]string{
 			"foo": "bar",
@@ -350,7 +350,7 @@ func TestNew_with_options_no_retry(t *testing.T) {
 	assert.Equal(t, axios.retryStrategy, []time.Duration(nil))
 }
 func TestNew_with_options_with_retry(t *testing.T) {
-	options := AxiosOptions{
+	options := Options{
 		WithRetry: true,
 	}
 	axios := New(&options)
