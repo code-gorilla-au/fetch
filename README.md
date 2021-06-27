@@ -48,7 +48,11 @@ headers := map[string]string{
     "Authorization": "Bearer boo"
 }
 
-fetch := fetch.New(headers)
+options := fetch.Options{
+    DefaultHeaders = headers,
+}
+
+fetch := fetch.New(options)
 resp, err := fetch.Get("https://icanhazdadjoke.com/", nil)
 if err != nil {
     os.Exit(1)
