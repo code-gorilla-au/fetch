@@ -40,7 +40,7 @@ var _ client = (*Client)(nil)
 func New(options *Options) *Client {
 	var axios Client
 	if options == nil {
-		return setDefaultAxios()
+		return setDefaultFetch()
 	}
 	if options.WithRetry {
 		axios.retryStrategy = setDefaultRetryStrategy()

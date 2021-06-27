@@ -320,12 +320,12 @@ func TestAxios_Post_no_retry(t *testing.T) {
 
 func TestNew_with_default_retry(t *testing.T) {
 	axios := New(nil)
-	assert.Equal(t, axios.retryStrategy, setDefaultAxios().retryStrategy)
+	assert.Equal(t, axios.retryStrategy, setDefaultFetch().retryStrategy)
 }
 
 func TestNew_with_default_header(t *testing.T) {
 	axios := New(nil)
-	assert.Equal(t, axios.defaultHeaders, setDefaultAxios().defaultHeaders)
+	assert.Equal(t, axios.defaultHeaders, setDefaultFetch().defaultHeaders)
 }
 
 func TestNew_with_options_headers(t *testing.T) {

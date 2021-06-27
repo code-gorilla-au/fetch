@@ -7,7 +7,9 @@ import (
 )
 
 type Options struct {
-	WithRetry      bool
+	// if you want the option of retrying the HTTP call, default is true
+	WithRetry bool
+	// set headers to be send out with every request, default is none
 	DefaultHeaders map[string]string
 }
 
@@ -40,7 +42,7 @@ func setDefaultClient() *http.Client {
 	}
 }
 
-func setDefaultAxios() *Client {
+func setDefaultFetch() *Client {
 	return &Client{
 		retryStrategy: setDefaultRetryStrategy(),
 		client:        setDefaultClient(),
