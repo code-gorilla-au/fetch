@@ -1,0 +1,136 @@
+package fetch
+
+import (
+	"bytes"
+	"errors"
+	"fmt"
+	"io"
+	"net/http"
+	"time"
+)
+
+var (
+	ErrNoValidRetryStrategy = errors.New("no valid retry strategy")
+)
+
+// axiosClient - basic http client with retry
+type axiosClient interface {
+	Get(url string, headers map[string]string) (resp *http.Response, err error)
+	Post(url string, body io.Reader, headers map[string]string) (resp *http.Response, err error)
+	Put(url string, body io.Reader, headers map[string]string) (resp *http.Response, err error)
+	Patch(url string, body io.Reader, headers map[string]string) (resp *http.Response, err error)
+	Delete(url string, body io.Reader, headers map[string]string) (resp *http.Response, err error)
+}
+
+// httpClient - client interface
+type httpClient interface {
+	Do(req *http.Request) (*http.Response, error)
+	Get(url string) (resp *http.Response, err error)
+	Post(url string, contentType string, body io.Reader) (resp *http.Response, err error)
+}
+
+type Axios struct {
+	retryStrategy  []time.Duration
+	client         httpClient
+	defaultHeaders map[string]string
+}
+
+var _ axiosClient = (*Axios)(nil)
+
+func New(options *AxiosOptions) *Axios {
+	var axios Axios
+	if options == nil {
+		return setDefaultAxios()
+	}
+	if options.WithRetry {
+		axios.retryStrategy = setDefaultRetryStrategy()
+	}
+	axios.defaultHeaders = options.DefaultHeaders
+	axios.client = setDefaultClient()
+	return &axios
+}
+
+func (a *Axios) Get(url string, headers map[string]string) (*http.Response, error) {
+	if a.retryStrategy == nil {
+		return call(url, http.MethodGet, bytes.NewReader(nil), a.client, headers)
+	}
+	return callWithRetry(url, http.MethodGet, bytes.NewReader(nil), a.client, a.retryStrategy, headers)
+}
+
+func (a *Axios) Post(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
+	if a.retryStrategy == nil {
+		return call(url, http.MethodPost, body, a.client, headers)
+	}
+	return callWithRetry(url, http.MethodPost, body, a.client, a.retryStrategy, headers)
+}
+
+func (a *Axios) Put(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
+	if a.retryStrategy == nil {
+		return call(url, http.MethodPut, body, a.client, headers)
+	}
+	return callWithRetry(url, http.MethodPut, body, a.client, a.retryStrategy, headers)
+}
+
+func (a *Axios) Delete(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
+	if a.retryStrategy == nil {
+		return call(url, http.MethodDelete, body, a.client, headers)
+	}
+	return callWithRetry(url, http.MethodDelete, body, a.client, a.retryStrategy, headers)
+}
+
+func (a *Axios) Patch(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
+	if a.retryStrategy == nil {
+		return call(url, http.MethodPatch, body, a.client, headers)
+	}
+	return callWithRetry(url, http.MethodPatch, body, a.client, a.retryStrategy, headers)
+}
+
+// call - creates a new HTTP request and returns an HTTP response
+func call(url string, method string, body io.Reader, client httpClient, headers ...map[string]string) (*http.Response, error) {
+	req, err := http.NewRequest(http.MethodPost, url, body)
+	if err != nil {
+		return &http.Response{}, err
+	}
+	allHeaders := mergeHeaders(headers...)
+	for key, value := range allHeaders {
+		req.Header.Add(key, value)
+	}
+	resp, err := client.Do(req)
+	return resp, err
+}
+
+// callWithRetry - wrap the call method with the retry strategy
+func callWithRetry(url string, method string, body io.Reader, client httpClient, retryStrategy []time.Duration, headers ...map[string]string) (*http.Response, error) {
+	logPrefix := "axios: callWithRetry"
+	var resp *http.Response
+	var err error
+
+	if len(retryStrategy) == 0 {
+		return resp, ErrNoValidRetryStrategy
+	}
+
+	for _, retryWait := range retryStrategy {
+		resp, err = call(url, http.MethodPost, body, client, headers...)
+		if err == nil {
+			if resp.StatusCode == http.StatusTooManyRequests {
+				return resp, errors.New(http.StatusText(resp.StatusCode))
+			}
+			return resp, nil
+		}
+		fmt.Printf("%s: http %s request error [%s], will retry in [%s]", logPrefix, method, err, retryWait)
+		time.Sleep(retryWait)
+	}
+
+	return resp, err
+}
+
+// mergeHeaders - merge a slice of headers
+func mergeHeaders(headersList ...map[string]string) map[string]string {
+	mergedHeaders := map[string]string{}
+	for _, headers := range headersList {
+		for key, value := range headers {
+			mergedHeaders[key] = value
+		}
+	}
+	return mergedHeaders
+}
