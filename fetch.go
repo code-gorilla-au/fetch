@@ -38,16 +38,16 @@ type Client struct {
 var _ client = (*Client)(nil)
 
 func New(options *Options) *Client {
-	var axios Client
+	var fetch Client
 	if options == nil {
 		return setDefaultFetch()
 	}
 	if options.WithRetry {
-		axios.retryStrategy = setDefaultRetryStrategy()
+		fetch.retryStrategy = setDefaultRetryStrategy()
 	}
-	axios.defaultHeaders = options.DefaultHeaders
-	axios.client = setDefaultClient()
-	return &axios
+	fetch.defaultHeaders = options.DefaultHeaders
+	fetch.client = setDefaultClient()
+	return &fetch
 }
 
 func (a *Client) Get(url string, headers map[string]string) (*http.Response, error) {
@@ -101,7 +101,7 @@ func call(url string, method string, body io.Reader, client httpClient, headers 
 
 // callWithRetry - wrap the call method with the retry strategy
 func callWithRetry(url string, method string, body io.Reader, client httpClient, retryStrategy []time.Duration, headers ...map[string]string) (*http.Response, error) {
-	logPrefix := "axios: callWithRetry"
+	logPrefix := "fetch: callWithRetry"
 	var resp *http.Response
 	var err error
 
