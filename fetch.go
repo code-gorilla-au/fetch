@@ -87,7 +87,7 @@ func (a *Client) Patch(url string, body io.Reader, headers map[string]string) (*
 
 // call - creates a new HTTP request and returns an HTTP response
 func call(url string, method string, body io.Reader, client httpClient, headers ...map[string]string) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodPost, url, body)
+	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return &http.Response{}, err
 	}

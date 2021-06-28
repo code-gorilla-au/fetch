@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_call_should_not_return_error_and_match_req(t *testing.T) {
+func Test_call_POST_should_not_return_error_and_match_req(t *testing.T) {
 	m := MockHTTPClient{}
 
 	expectedHeaders := map[string]string{
@@ -27,6 +27,81 @@ func Test_call_should_not_return_error_and_match_req(t *testing.T) {
 	}
 	assert.Equal(t, m.Req.URL.String(), url)
 	assert.Equal(t, m.Req.Method, http.MethodPost)
+
+}
+
+func Test_call_GET_should_not_return_error_and_match_req(t *testing.T) {
+	m := MockHTTPClient{}
+
+	expectedHeaders := map[string]string{
+		"Auth": "/app/json",
+	}
+
+	url := "foo"
+
+	_, err := call(url, http.MethodGet, nil, &m, expectedHeaders)
+	assert.NoError(t, err)
+	for key, value := range expectedHeaders {
+		assert.Equal(t, m.Req.Header.Get(key), value)
+	}
+	assert.Equal(t, m.Req.URL.String(), url)
+	assert.Equal(t, m.Req.Method, http.MethodGet)
+
+}
+func Test_call_PUT_should_not_return_error_and_match_req(t *testing.T) {
+	m := MockHTTPClient{}
+
+	expectedHeaders := map[string]string{
+		"Auth": "/app/json",
+	}
+
+	url := "foo"
+
+	_, err := call(url, http.MethodPut, nil, &m, expectedHeaders)
+	assert.NoError(t, err)
+	for key, value := range expectedHeaders {
+		assert.Equal(t, m.Req.Header.Get(key), value)
+	}
+	assert.Equal(t, m.Req.URL.String(), url)
+	assert.Equal(t, m.Req.Method, http.MethodPut)
+
+}
+
+func Test_call_PATCH_should_not_return_error_and_match_req(t *testing.T) {
+	m := MockHTTPClient{}
+
+	expectedHeaders := map[string]string{
+		"Auth": "/app/json",
+	}
+
+	url := "foo"
+
+	_, err := call(url, http.MethodPatch, nil, &m, expectedHeaders)
+	assert.NoError(t, err)
+	for key, value := range expectedHeaders {
+		assert.Equal(t, m.Req.Header.Get(key), value)
+	}
+	assert.Equal(t, m.Req.URL.String(), url)
+	assert.Equal(t, m.Req.Method, http.MethodPatch)
+
+}
+
+func Test_call_DELETE_should_not_return_error_and_match_req(t *testing.T) {
+	m := MockHTTPClient{}
+
+	expectedHeaders := map[string]string{
+		"Auth": "/app/json",
+	}
+
+	url := "foo"
+
+	_, err := call(url, http.MethodDelete, nil, &m, expectedHeaders)
+	assert.NoError(t, err)
+	for key, value := range expectedHeaders {
+		assert.Equal(t, m.Req.Header.Get(key), value)
+	}
+	assert.Equal(t, m.Req.URL.String(), url)
+	assert.Equal(t, m.Req.Method, http.MethodDelete)
 
 }
 
