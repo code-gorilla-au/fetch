@@ -111,7 +111,7 @@ func callWithRetry(url string, method string, body io.Reader, client httpClient,
 	}
 
 	for _, retryWait := range retryStrategy {
-		resp, err = call(url, http.MethodPost, body, client, headers...)
+		resp, err = call(url, method, body, client, headers...)
 		if err == nil {
 			if resp.StatusCode == http.StatusTooManyRequests {
 				return resp, ErrTooManyRequests

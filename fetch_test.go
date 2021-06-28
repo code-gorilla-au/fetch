@@ -191,9 +191,10 @@ func Test_callWithRetry_should_return_response(t *testing.T) {
 		},
 	}
 
-	resp, err := callWithRetry("", http.MethodPost, nil, &m, []time.Duration{1 * time.Nanosecond})
+	resp, err := callWithRetry("", http.MethodGet, nil, &m, []time.Duration{1 * time.Nanosecond})
 	assert.NoError(t, err, m.Err)
 	assert.Equal(t, resp, m.Resp)
+	assert.Equal(t, m.Req.Method, http.MethodGet)
 }
 
 func TestAxios_Patch_no_retry(t *testing.T) {
