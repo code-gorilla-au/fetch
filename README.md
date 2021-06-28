@@ -1,6 +1,11 @@
 # Fetch
 
-simple http client
+simple http client with a basic retry / back off strategy
+
+- 1 seconds
+- 3 seconds
+- 5 seconds
+- 10 seconds
 
 ## Examples
 
