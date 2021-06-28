@@ -11,6 +11,7 @@ import (
 
 var (
 	ErrNoValidRetryStrategy = errors.New("no valid retry strategy")
+	ErrTooManyRequests      = errors.New("too many http requests")
 )
 
 // client - basic http client with retry
@@ -113,7 +114,7 @@ func callWithRetry(url string, method string, body io.Reader, client httpClient,
 		resp, err = call(url, http.MethodPost, body, client, headers...)
 		if err == nil {
 			if resp.StatusCode == http.StatusTooManyRequests {
-				return resp, errors.New(http.StatusText(resp.StatusCode))
+				return resp, ErrTooManyRequests
 			}
 			return resp, nil
 		}

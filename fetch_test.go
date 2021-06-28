@@ -172,6 +172,18 @@ func Test_callWithRetry_nill_retries_should_return_error(t *testing.T) {
 	_, err := callWithRetry("", http.MethodPost, nil, &m, nil)
 	assert.ErrorIs(t, err, ErrNoValidRetryStrategy)
 }
+
+func Test_callWithRetry_too_many_requests_should_return_error(t *testing.T) {
+	m := MockHTTPClient{
+		ErrDo: false,
+		Resp: &http.Response{
+			StatusCode: http.StatusTooManyRequests,
+		},
+	}
+
+	_, err := callWithRetry("", http.MethodPost, nil, &m, []time.Duration{1 * time.Nanosecond})
+	assert.ErrorIs(t, err, ErrTooManyRequests)
+}
 func Test_callWithRetry_should_return_response(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
