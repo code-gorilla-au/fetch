@@ -53,37 +53,37 @@ func New(options *Options) *Client {
 
 func (a *Client) Get(url string, headers map[string]string) (*http.Response, error) {
 	if a.retryStrategy == nil {
-		return call(url, http.MethodGet, bytes.NewReader(nil), a.client, headers)
+		return call(url, http.MethodGet, bytes.NewReader(nil), a.client, headers, a.defaultHeaders)
 	}
-	return callWithRetry(url, http.MethodGet, bytes.NewReader(nil), a.client, a.retryStrategy, headers)
+	return callWithRetry(url, http.MethodGet, bytes.NewReader(nil), a.client, a.retryStrategy, headers, a.defaultHeaders)
 }
 
 func (a *Client) Post(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
 	if a.retryStrategy == nil {
-		return call(url, http.MethodPost, body, a.client, headers)
+		return call(url, http.MethodPost, body, a.client, headers, a.defaultHeaders)
 	}
-	return callWithRetry(url, http.MethodPost, body, a.client, a.retryStrategy, headers)
+	return callWithRetry(url, http.MethodPost, body, a.client, a.retryStrategy, headers, a.defaultHeaders)
 }
 
 func (a *Client) Put(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
 	if a.retryStrategy == nil {
-		return call(url, http.MethodPut, body, a.client, headers)
+		return call(url, http.MethodPut, body, a.client, headers, a.defaultHeaders)
 	}
-	return callWithRetry(url, http.MethodPut, body, a.client, a.retryStrategy, headers)
+	return callWithRetry(url, http.MethodPut, body, a.client, a.retryStrategy, headers, a.defaultHeaders)
 }
 
 func (a *Client) Delete(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
 	if a.retryStrategy == nil {
-		return call(url, http.MethodDelete, body, a.client, headers)
+		return call(url, http.MethodDelete, body, a.client, headers, a.defaultHeaders)
 	}
-	return callWithRetry(url, http.MethodDelete, body, a.client, a.retryStrategy, headers)
+	return callWithRetry(url, http.MethodDelete, body, a.client, a.retryStrategy, headers, a.defaultHeaders)
 }
 
 func (a *Client) Patch(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
 	if a.retryStrategy == nil {
-		return call(url, http.MethodPatch, body, a.client, headers)
+		return call(url, http.MethodPatch, body, a.client, headers, a.defaultHeaders)
 	}
-	return callWithRetry(url, http.MethodPatch, body, a.client, a.retryStrategy, headers)
+	return callWithRetry(url, http.MethodPatch, body, a.client, a.retryStrategy, headers, a.defaultHeaders)
 }
 
 // call - creates a new HTTP request and returns an HTTP response

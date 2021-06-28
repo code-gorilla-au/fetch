@@ -208,14 +208,51 @@ func TestAxios_Patch_no_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
+	defaultHeaders := map[string]string{
+		"default-header": "bar",
+	}
+
 	axios := &Client{
-		retryStrategy: nil,
-		client:        &m,
+		retryStrategy:  nil,
+		client:         &m,
+		defaultHeaders: defaultHeaders,
 	}
 
 	resp, err := axios.Patch("", bytes.NewReader(nil), headers)
 	assert.NoError(t, err, m.Err)
 	assert.Equal(t, resp, m.Resp)
+}
+
+func TestAxios_Patch_no_retry_with_default_and_normal_headers(t *testing.T) {
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			Status: http.StatusText(http.StatusOK),
+		},
+	}
+
+	headers := map[string]string{
+		"Content-Type": "application/json",
+	}
+
+	defaultHeaders := map[string]string{
+		"default-header": "bar",
+	}
+
+	axios := &Client{
+		retryStrategy:  nil,
+		client:         &m,
+		defaultHeaders: defaultHeaders,
+	}
+
+	resp, err := axios.Patch("", bytes.NewReader(nil), headers)
+	assert.NoError(t, err, m.Err)
+	assert.Equal(t, resp, m.Resp)
+	for key, value := range defaultHeaders {
+		assert.Equal(t, m.Req.Header.Get(key), value)
+	}
+	for key, value := range headers {
+		assert.Equal(t, m.Req.Header.Get(key), value)
+	}
 }
 
 func TestAxios_Patch_with_retry(t *testing.T) {
@@ -281,6 +318,38 @@ func TestAxios_Delete_with_retry(t *testing.T) {
 	assert.Equal(t, resp, m.Resp)
 }
 
+func TestAxios_Delete_with_retry_with_default_and_normal_headers(t *testing.T) {
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			Status: http.StatusText(http.StatusOK),
+		},
+	}
+
+	headers := map[string]string{
+		"Content-Type": "application/json",
+	}
+
+	defaultHeaders := map[string]string{
+		"default-header": "bar",
+	}
+
+	axios := &Client{
+		retryStrategy:  nil,
+		client:         &m,
+		defaultHeaders: defaultHeaders,
+	}
+
+	resp, err := axios.Delete("", bytes.NewReader(nil), headers)
+	assert.NoError(t, err, m.Err)
+	assert.Equal(t, resp, m.Resp)
+	for key, value := range defaultHeaders {
+		assert.Equal(t, m.Req.Header.Get(key), value)
+	}
+	for key, value := range headers {
+		assert.Equal(t, m.Req.Header.Get(key), value)
+	}
+}
+
 func TestAxios_Put_no_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
@@ -321,6 +390,38 @@ func TestAxios_Put_with_retry(t *testing.T) {
 	resp, err := axios.Put("", bytes.NewReader(nil), headers)
 	assert.NoError(t, err, m.Err)
 	assert.Equal(t, resp, m.Resp)
+}
+
+func TestAxios_Put_with_retry_with_default_and_normal_headers(t *testing.T) {
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			Status: http.StatusText(http.StatusOK),
+		},
+	}
+
+	headers := map[string]string{
+		"Content-Type": "application/json",
+	}
+
+	defaultHeaders := map[string]string{
+		"default-header": "bar",
+	}
+
+	axios := &Client{
+		retryStrategy:  nil,
+		client:         &m,
+		defaultHeaders: defaultHeaders,
+	}
+
+	resp, err := axios.Put("", bytes.NewReader(nil), headers)
+	assert.NoError(t, err, m.Err)
+	assert.Equal(t, resp, m.Resp)
+	for key, value := range defaultHeaders {
+		assert.Equal(t, m.Req.Header.Get(key), value)
+	}
+	for key, value := range headers {
+		assert.Equal(t, m.Req.Header.Get(key), value)
+	}
 }
 
 func TestAxios_Get_with_retry(t *testing.T) {
@@ -364,6 +465,38 @@ func TestAxios_Get_no_retry(t *testing.T) {
 	assert.Equal(t, resp, m.Resp)
 }
 
+func TestAxios_Get_no_retry_with_default_and_normal_headers(t *testing.T) {
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			Status: http.StatusText(http.StatusOK),
+		},
+	}
+
+	headers := map[string]string{
+		"Content-Type": "application/json",
+	}
+
+	defaultHeaders := map[string]string{
+		"default-header": "bar",
+	}
+
+	axios := &Client{
+		retryStrategy:  nil,
+		client:         &m,
+		defaultHeaders: defaultHeaders,
+	}
+
+	resp, err := axios.Get("", headers)
+	assert.NoError(t, err, m.Err)
+	assert.Equal(t, resp, m.Resp)
+	for key, value := range defaultHeaders {
+		assert.Equal(t, m.Req.Header.Get(key), value)
+	}
+	for key, value := range headers {
+		assert.Equal(t, m.Req.Header.Get(key), value)
+	}
+}
+
 func TestAxios_Post_with_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
@@ -404,6 +537,38 @@ func TestAxios_Post_no_retry(t *testing.T) {
 	resp, err := axios.Post("", bytes.NewReader(nil), headers)
 	assert.NoError(t, err, m.Err)
 	assert.Equal(t, resp, m.Resp)
+}
+
+func TestAxios_Post_no_retry_with_default_and_normal_headers(t *testing.T) {
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			Status: http.StatusText(http.StatusOK),
+		},
+	}
+
+	headers := map[string]string{
+		"Content-Type": "application/json",
+	}
+
+	defaultHeaders := map[string]string{
+		"default-header": "bar",
+	}
+
+	axios := &Client{
+		retryStrategy:  nil,
+		client:         &m,
+		defaultHeaders: defaultHeaders,
+	}
+
+	resp, err := axios.Post("", bytes.NewReader(nil), headers)
+	assert.NoError(t, err, m.Err)
+	assert.Equal(t, resp, m.Resp)
+	for key, value := range defaultHeaders {
+		assert.Equal(t, m.Req.Header.Get(key), value)
+	}
+	for key, value := range headers {
+		assert.Equal(t, m.Req.Header.Get(key), value)
+	}
 }
 
 func TestNew_with_default_retry(t *testing.T) {
