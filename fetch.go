@@ -149,15 +149,17 @@ func validateStatusCodes(resp *http.Response) error {
 	if resp.StatusCode == 0 || resp.StatusCode > 599 {
 		return &APIError{
 			Message:    "unexpected http status",
-			StatusCode: 0,
+			StatusCode: resp.StatusCode,
 			StatusText: "Unexpected",
 		}
 	}
-	if resp.StatusCode == http.StatusNotImplemented {
+
+	if resp.StatusCode == http.StatusNotImplemented || (resp.StatusCode > http.StatusBadRequest && resp.StatusCode < http.StatusInternalServerError) {
 		return &APIError{
 			StatusCode: resp.StatusCode,
 			StatusText: http.StatusText(resp.StatusCode),
 		}
 	}
+
 	return nil
 }
