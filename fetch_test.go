@@ -213,9 +213,9 @@ func TestAxios_Patch_no_retry(t *testing.T) {
 	}
 
 	axios := &Client{
-		retryStrategy:  nil,
-		client:         &m,
-		defaultHeaders: defaultHeaders,
+		RetryStrategy:  nil,
+		Client:         &m,
+		DefaultHeaders: defaultHeaders,
 	}
 
 	resp, err := axios.Patch("", bytes.NewReader(nil), headers)
@@ -239,9 +239,9 @@ func TestAxios_Patch_no_retry_with_default_and_normal_headers(t *testing.T) {
 	}
 
 	axios := &Client{
-		retryStrategy:  nil,
-		client:         &m,
-		defaultHeaders: defaultHeaders,
+		RetryStrategy:  nil,
+		Client:         &m,
+		DefaultHeaders: defaultHeaders,
 	}
 
 	resp, err := axios.Patch("", bytes.NewReader(nil), headers)
@@ -267,8 +267,8 @@ func TestAxios_Patch_with_retry(t *testing.T) {
 	}
 
 	axios := &Client{
-		retryStrategy: []time.Duration{1 * time.Nanosecond},
-		client:        &m,
+		RetryStrategy: []time.Duration{1 * time.Nanosecond},
+		Client:        &m,
 	}
 
 	resp, err := axios.Patch("", bytes.NewReader(nil), headers)
@@ -288,8 +288,8 @@ func TestAxios_Delete_no_retry(t *testing.T) {
 	}
 
 	axios := &Client{
-		retryStrategy: nil,
-		client:        &m,
+		RetryStrategy: nil,
+		Client:        &m,
 	}
 
 	resp, err := axios.Delete("", bytes.NewReader(nil), headers)
@@ -309,8 +309,8 @@ func TestAxios_Delete_with_retry(t *testing.T) {
 	}
 
 	axios := &Client{
-		retryStrategy: []time.Duration{1 * time.Nanosecond},
-		client:        &m,
+		RetryStrategy: []time.Duration{1 * time.Nanosecond},
+		Client:        &m,
 	}
 
 	resp, err := axios.Delete("", bytes.NewReader(nil), headers)
@@ -334,9 +334,9 @@ func TestAxios_Delete_with_retry_with_default_and_normal_headers(t *testing.T) {
 	}
 
 	axios := &Client{
-		retryStrategy:  nil,
-		client:         &m,
-		defaultHeaders: defaultHeaders,
+		RetryStrategy:  nil,
+		Client:         &m,
+		DefaultHeaders: defaultHeaders,
 	}
 
 	resp, err := axios.Delete("", bytes.NewReader(nil), headers)
@@ -362,8 +362,8 @@ func TestAxios_Put_no_retry(t *testing.T) {
 	}
 
 	axios := &Client{
-		retryStrategy: nil,
-		client:        &m,
+		RetryStrategy: nil,
+		Client:        &m,
 	}
 
 	resp, err := axios.Put("", bytes.NewReader(nil), headers)
@@ -383,8 +383,8 @@ func TestAxios_Put_with_retry(t *testing.T) {
 	}
 
 	axios := &Client{
-		retryStrategy: []time.Duration{1 * time.Nanosecond},
-		client:        &m,
+		RetryStrategy: []time.Duration{1 * time.Nanosecond},
+		Client:        &m,
 	}
 
 	resp, err := axios.Put("", bytes.NewReader(nil), headers)
@@ -408,9 +408,9 @@ func TestAxios_Put_with_retry_with_default_and_normal_headers(t *testing.T) {
 	}
 
 	axios := &Client{
-		retryStrategy:  nil,
-		client:         &m,
-		defaultHeaders: defaultHeaders,
+		RetryStrategy:  nil,
+		Client:         &m,
+		DefaultHeaders: defaultHeaders,
 	}
 
 	resp, err := axios.Put("", bytes.NewReader(nil), headers)
@@ -436,8 +436,8 @@ func TestAxios_Get_with_retry(t *testing.T) {
 	}
 
 	axios := &Client{
-		retryStrategy: []time.Duration{1 * time.Nanosecond},
-		client:        &m,
+		RetryStrategy: []time.Duration{1 * time.Nanosecond},
+		Client:        &m,
 	}
 
 	resp, err := axios.Get("", headers)
@@ -456,8 +456,8 @@ func TestAxios_Get_no_retry(t *testing.T) {
 	}
 
 	axios := &Client{
-		retryStrategy: nil,
-		client:        &m,
+		RetryStrategy: nil,
+		Client:        &m,
 	}
 
 	resp, err := axios.Get("", headers)
@@ -481,9 +481,9 @@ func TestAxios_Get_no_retry_with_default_and_normal_headers(t *testing.T) {
 	}
 
 	axios := &Client{
-		retryStrategy:  nil,
-		client:         &m,
-		defaultHeaders: defaultHeaders,
+		RetryStrategy:  nil,
+		Client:         &m,
+		DefaultHeaders: defaultHeaders,
 	}
 
 	resp, err := axios.Get("", headers)
@@ -509,8 +509,8 @@ func TestAxios_Post_with_retry(t *testing.T) {
 	}
 
 	axios := &Client{
-		retryStrategy: []time.Duration{1 * time.Nanosecond},
-		client:        &m,
+		RetryStrategy: []time.Duration{1 * time.Nanosecond},
+		Client:        &m,
 	}
 
 	resp, err := axios.Post("", bytes.NewReader(nil), headers)
@@ -530,8 +530,8 @@ func TestAxios_Post_no_retry(t *testing.T) {
 	}
 
 	axios := &Client{
-		retryStrategy: nil,
-		client:        &m,
+		RetryStrategy: nil,
+		Client:        &m,
 	}
 
 	resp, err := axios.Post("", bytes.NewReader(nil), headers)
@@ -555,9 +555,9 @@ func TestAxios_Post_no_retry_with_default_and_normal_headers(t *testing.T) {
 	}
 
 	axios := &Client{
-		retryStrategy:  nil,
-		client:         &m,
-		defaultHeaders: defaultHeaders,
+		RetryStrategy:  nil,
+		Client:         &m,
+		DefaultHeaders: defaultHeaders,
 	}
 
 	resp, err := axios.Post("", bytes.NewReader(nil), headers)
@@ -573,12 +573,12 @@ func TestAxios_Post_no_retry_with_default_and_normal_headers(t *testing.T) {
 
 func TestNew_with_default_retry(t *testing.T) {
 	axios := New(nil)
-	assert.Equal(t, axios.retryStrategy, setDefaultFetch().retryStrategy)
+	assert.Equal(t, axios.RetryStrategy, setDefaultFetch().RetryStrategy)
 }
 
 func TestNew_with_default_header(t *testing.T) {
 	axios := New(nil)
-	assert.Equal(t, axios.defaultHeaders, setDefaultFetch().defaultHeaders)
+	assert.Equal(t, axios.DefaultHeaders, setDefaultFetch().DefaultHeaders)
 }
 
 func TestNew_with_options_headers(t *testing.T) {
@@ -589,7 +589,7 @@ func TestNew_with_options_headers(t *testing.T) {
 		},
 	}
 	axios := New(&options)
-	assert.Equal(t, axios.defaultHeaders, options.DefaultHeaders)
+	assert.Equal(t, axios.DefaultHeaders, options.DefaultHeaders)
 }
 
 func TestNew_with_options_no_retry(t *testing.T) {
@@ -600,14 +600,14 @@ func TestNew_with_options_no_retry(t *testing.T) {
 		},
 	}
 	axios := New(&options)
-	assert.Equal(t, axios.retryStrategy, []time.Duration(nil))
+	assert.Equal(t, axios.RetryStrategy, []time.Duration(nil))
 }
 func TestNew_with_options_with_retry(t *testing.T) {
 	options := Options{
 		WithRetry: true,
 	}
 	axios := New(&options)
-	assert.Equal(t, axios.retryStrategy, setDefaultRetryStrategy())
+	assert.Equal(t, axios.RetryStrategy, setDefaultRetryStrategy())
 }
 
 func Test_mergeHeaders_should_merge_correctly(t *testing.T) {

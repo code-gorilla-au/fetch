@@ -31,9 +31,13 @@ type httpClient interface {
 }
 
 type Client struct {
-	retryStrategy  []time.Duration
-	client         httpClient
-	defaultHeaders map[string]string
+	// Retry backoff strategy.
+	// Default is 1s,3s,5s,10s
+	RetryStrategy []time.Duration
+	// HTTP client
+	Client httpClient
+	// Headers to be added to each request
+	DefaultHeaders map[string]string
 }
 
 var _ client = (*Client)(nil)
@@ -44,46 +48,46 @@ func New(options *Options) *Client {
 		return setDefaultFetch()
 	}
 	if options.WithRetry {
-		fetch.retryStrategy = setDefaultRetryStrategy()
+		fetch.RetryStrategy = setDefaultRetryStrategy()
 	}
-	fetch.defaultHeaders = options.DefaultHeaders
-	fetch.client = setDefaultClient()
+	fetch.DefaultHeaders = options.DefaultHeaders
+	fetch.Client = setDefaultClient()
 	return &fetch
 }
 
 func (a *Client) Get(url string, headers map[string]string) (*http.Response, error) {
-	if a.retryStrategy == nil {
-		return call(url, http.MethodGet, bytes.NewReader(nil), a.client, headers, a.defaultHeaders)
+	if a.RetryStrategy == nil {
+		return call(url, http.MethodGet, bytes.NewReader(nil), a.Client, headers, a.DefaultHeaders)
 	}
-	return callWithRetry(url, http.MethodGet, bytes.NewReader(nil), a.client, a.retryStrategy, headers, a.defaultHeaders)
+	return callWithRetry(url, http.MethodGet, bytes.NewReader(nil), a.Client, a.RetryStrategy, headers, a.DefaultHeaders)
 }
 
 func (a *Client) Post(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
-	if a.retryStrategy == nil {
-		return call(url, http.MethodPost, body, a.client, headers, a.defaultHeaders)
+	if a.RetryStrategy == nil {
+		return call(url, http.MethodPost, body, a.Client, headers, a.DefaultHeaders)
 	}
-	return callWithRetry(url, http.MethodPost, body, a.client, a.retryStrategy, headers, a.defaultHeaders)
+	return callWithRetry(url, http.MethodPost, body, a.Client, a.RetryStrategy, headers, a.DefaultHeaders)
 }
 
 func (a *Client) Put(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
-	if a.retryStrategy == nil {
-		return call(url, http.MethodPut, body, a.client, headers, a.defaultHeaders)
+	if a.RetryStrategy == nil {
+		return call(url, http.MethodPut, body, a.Client, headers, a.DefaultHeaders)
 	}
-	return callWithRetry(url, http.MethodPut, body, a.client, a.retryStrategy, headers, a.defaultHeaders)
+	return callWithRetry(url, http.MethodPut, body, a.Client, a.RetryStrategy, headers, a.DefaultHeaders)
 }
 
 func (a *Client) Delete(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
-	if a.retryStrategy == nil {
-		return call(url, http.MethodDelete, body, a.client, headers, a.defaultHeaders)
+	if a.RetryStrategy == nil {
+		return call(url, http.MethodDelete, body, a.Client, headers, a.DefaultHeaders)
 	}
-	return callWithRetry(url, http.MethodDelete, body, a.client, a.retryStrategy, headers, a.defaultHeaders)
+	return callWithRetry(url, http.MethodDelete, body, a.Client, a.RetryStrategy, headers, a.DefaultHeaders)
 }
 
 func (a *Client) Patch(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
-	if a.retryStrategy == nil {
-		return call(url, http.MethodPatch, body, a.client, headers, a.defaultHeaders)
+	if a.RetryStrategy == nil {
+		return call(url, http.MethodPatch, body, a.Client, headers, a.DefaultHeaders)
 	}
-	return callWithRetry(url, http.MethodPatch, body, a.client, a.retryStrategy, headers, a.defaultHeaders)
+	return callWithRetry(url, http.MethodPatch, body, a.Client, a.RetryStrategy, headers, a.DefaultHeaders)
 }
 
 // call - creates a new HTTP request and returns an HTTP response

@@ -44,7 +44,7 @@ func setDefaultClient() *http.Client {
 
 func setDefaultFetch() *Client {
 	return &Client{
-		retryStrategy: setDefaultRetryStrategy(),
-		client:        setDefaultClient(),
+		RetryStrategy: setDefaultRetryStrategy(),
+		Client:        setDefaultClient(),
 	}
 }
