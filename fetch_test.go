@@ -13,7 +13,11 @@ import (
 )
 
 func Test_call_POST_should_not_return_error_and_match_req(t *testing.T) {
-	m := MockHTTPClient{}
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			StatusCode: http.StatusOK,
+		},
+	}
 
 	expectedHeaders := map[string]string{
 		"Auth": "/app/json",
@@ -31,8 +35,32 @@ func Test_call_POST_should_not_return_error_and_match_req(t *testing.T) {
 
 }
 
+func Test_call_POST_4xx_should_return_error(t *testing.T) {
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			StatusCode: http.StatusBadRequest,
+		},
+	}
+
+	expectedHeaders := map[string]string{
+		"Auth": "/app/json",
+	}
+
+	url := "foo"
+
+	var expectedErr *APIError
+
+	_, err := call(url, http.MethodPost, nil, &m, expectedHeaders)
+	assert.ErrorAs(t, err, expectedErr)
+
+}
+
 func Test_call_GET_should_not_return_error_and_match_req(t *testing.T) {
-	m := MockHTTPClient{}
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			StatusCode: http.StatusOK,
+		},
+	}
 
 	expectedHeaders := map[string]string{
 		"Auth": "/app/json",
@@ -50,7 +78,11 @@ func Test_call_GET_should_not_return_error_and_match_req(t *testing.T) {
 
 }
 func Test_call_PUT_should_not_return_error_and_match_req(t *testing.T) {
-	m := MockHTTPClient{}
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			StatusCode: http.StatusOK,
+		},
+	}
 
 	expectedHeaders := map[string]string{
 		"Auth": "/app/json",
@@ -69,7 +101,11 @@ func Test_call_PUT_should_not_return_error_and_match_req(t *testing.T) {
 }
 
 func Test_call_PATCH_should_not_return_error_and_match_req(t *testing.T) {
-	m := MockHTTPClient{}
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			StatusCode: http.StatusOK,
+		},
+	}
 
 	expectedHeaders := map[string]string{
 		"Auth": "/app/json",
@@ -88,7 +124,11 @@ func Test_call_PATCH_should_not_return_error_and_match_req(t *testing.T) {
 }
 
 func Test_call_DELETE_should_not_return_error_and_match_req(t *testing.T) {
-	m := MockHTTPClient{}
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			StatusCode: http.StatusOK,
+		},
+	}
 
 	expectedHeaders := map[string]string{
 		"Auth": "/app/json",

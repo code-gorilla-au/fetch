@@ -104,6 +104,12 @@ func call(url string, method string, body io.Reader, client httpClient, headers 
 		req.Header.Add(key, value)
 	}
 	resp, err := client.Do(req)
+	if err != nil {
+		return resp, err
+	}
+	fmt.Println(resp)
+	// non recoverable status codes
+	err = validateStatusCodes(resp)
 	return resp, err
 }
 
@@ -120,11 +126,6 @@ func callWithRetry(url string, method string, body io.Reader, client httpClient,
 	for _, retryWait := range retryStrategy {
 		resp, err = call(url, method, body, client, headers...)
 		if err == nil {
-			// non recoverable status codes
-			err := validateStatusCodes(resp)
-			if err != nil {
-				return resp, err
-			}
 			return resp, nil
 		}
 		fmt.Printf("%s: http %s request error [%s], will retry in [%s]", logPrefix, method, err, retryWait)
