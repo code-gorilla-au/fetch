@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -177,12 +178,14 @@ func Test_callWithRetry_too_many_requests_should_return_error(t *testing.T) {
 	m := MockHTTPClient{
 		ErrDo: false,
 		Resp: &http.Response{
-			StatusCode: http.StatusTooManyRequests,
+			StatusCode: http.StatusInternalServerError,
 		},
 	}
 
+	expectedErr := fmt.Errorf("%s: %s", errNonRecoverableError, http.StatusText(http.StatusInternalServerError))
+
 	_, err := callWithRetry("", http.MethodPost, nil, &m, []time.Duration{1 * time.Nanosecond})
-	assert.ErrorIs(t, err, ErrTooManyRequests)
+	assert.ErrorIs(t, err, expectedErr)
 }
 func Test_callWithRetry_should_return_response(t *testing.T) {
 	m := MockHTTPClient{

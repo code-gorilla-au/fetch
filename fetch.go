@@ -11,7 +11,10 @@ import (
 
 var (
 	ErrNoValidRetryStrategy = errors.New("no valid retry strategy")
-	ErrTooManyRequests      = errors.New("too many http requests")
+)
+
+const (
+	errNonRecoverableError = "non recoverable error"
 )
 
 // client - basic http client with retry
@@ -117,8 +120,10 @@ func callWithRetry(url string, method string, body io.Reader, client httpClient,
 	for _, retryWait := range retryStrategy {
 		resp, err = call(url, method, body, client, headers...)
 		if err == nil {
-			if resp.StatusCode == http.StatusTooManyRequests {
-				return resp, ErrTooManyRequests
+			// non recoverable status codes
+			err := validateStatusCodes(resp)
+			if err != nil {
+				return resp, err
 			}
 			return resp, nil
 		}
@@ -138,4 +143,21 @@ func mergeHeaders(headersList ...map[string]string) map[string]string {
 		}
 	}
 	return mergedHeaders
+}
+
+func validateStatusCodes(resp *http.Response) error {
+	if resp.StatusCode == 0 || resp.StatusCode > 599 {
+		return &APIError{
+			Message:    "unexpected http status",
+			StatusCode: 0,
+			StatusText: "Unexpected",
+		}
+	}
+	if resp.StatusCode == http.StatusNotImplemented {
+		return &APIError{
+			StatusCode: resp.StatusCode,
+			StatusText: http.StatusText(resp.StatusCode),
+		}
+	}
+	return nil
 }
