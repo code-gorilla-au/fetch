@@ -15,8 +15,17 @@ simple http client with a basic retry / back off strategy
 ```go
 
 fetch := fetch.New()
+var apiErr *fetch.APIError
 resp, err := fetch.Get("https://icanhazdadjoke.com/", nil)
 if err != nil {
+    if errors.As(err, &apiErr) {
+        // non 2xx,3xx response
+        // StatusCode: 400
+        // StatusText: Bad Request
+        // Message: ""
+        fmt.PrintLn(apiErr)
+    }
+    // standard errors
     os.Exit(1)
 }
 
@@ -33,6 +42,14 @@ headers := map[string]string{
 fetch := fetch.New()
 resp, err := fetch.Get("https://icanhazdadjoke.com/", headers)
 if err != nil {
+  if errors.As(err, &apiErr) {
+        // non 2xx,3xx response
+        // StatusCode: 400
+        // StatusText: Bad Request
+        // Message: ""
+        fmt.PrintLn(apiErr)
+    }
+    // standard errors
     os.Exit(1)
 }
 
@@ -54,6 +71,14 @@ options := fetch.Options{
 fetch := fetch.New(options)
 resp, err := fetch.Get("https://icanhazdadjoke.com/", nil)
 if err != nil {
+  if errors.As(err, &apiErr) {
+        // non 2xx,3xx response
+        // StatusCode: 400
+        // StatusText: Bad Request
+        // Message: ""
+        fmt.PrintLn(apiErr)
+    }
+    // standard errors
     os.Exit(1)
 }
 

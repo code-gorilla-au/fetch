@@ -148,6 +148,7 @@ func mergeHeaders(headersList ...map[string]string) map[string]string {
 	return mergedHeaders
 }
 
+// isRecoverable - checks if the response status code not within the 4XX range or is non standard status code
 func isRecoverable(err error) bool {
 	var apiError *APIError
 	if !errors.As(err, &apiError) {
