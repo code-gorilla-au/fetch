@@ -9,6 +9,8 @@ simple http client with a basic retry / back off strategy
 
 ## Examples
 
+- demo [dad jokes](cmd/dad_jokes/dad_jokes.go)
+
 
 ### fetch basic example
 
@@ -83,3 +85,7 @@ if err != nil {
 }
 
 ```
+
+## TODO
+
+feature requests being worked on will be added here
