@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -51,8 +50,11 @@ func Test_call_POST_4xx_should_return_error(t *testing.T) {
 	var expectedErr *APIError
 
 	_, err := call(url, http.MethodPost, nil, &m, expectedHeaders)
-	assert.ErrorAs(t, err, expectedErr)
-
+	if err == nil {
+		t.Error("expected error, got none")
+		return
+	}
+	assert.ErrorAs(t, err, &expectedErr)
 }
 
 func Test_call_GET_should_not_return_error_and_match_req(t *testing.T) {
@@ -214,19 +216,6 @@ func Test_callWithRetry_nill_retries_should_return_error(t *testing.T) {
 	assert.ErrorIs(t, err, ErrNoValidRetryStrategy)
 }
 
-func Test_callWithRetry_too_many_requests_should_return_error(t *testing.T) {
-	m := MockHTTPClient{
-		ErrDo: false,
-		Resp: &http.Response{
-			StatusCode: http.StatusInternalServerError,
-		},
-	}
-
-	expectedErr := fmt.Errorf("%s: %s", errNonRecoverableError, http.StatusText(http.StatusInternalServerError))
-
-	_, err := callWithRetry("", http.MethodPost, nil, &m, []time.Duration{1 * time.Nanosecond})
-	assert.ErrorIs(t, err, expectedErr)
-}
 func Test_callWithRetry_should_return_response(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{

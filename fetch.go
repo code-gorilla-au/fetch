@@ -13,10 +13,6 @@ var (
 	ErrNoValidRetryStrategy = errors.New("no valid retry strategy")
 )
 
-const (
-	errNonRecoverableError = "non recoverable error"
-)
-
 // client - basic http client with retry
 type client interface {
 	Get(url string, headers map[string]string) (resp *http.Response, err error)
@@ -155,7 +151,7 @@ func validateStatusCodes(resp *http.Response) error {
 		}
 	}
 
-	if resp.StatusCode == http.StatusNotImplemented || (resp.StatusCode > http.StatusBadRequest && resp.StatusCode < http.StatusInternalServerError) {
+	if resp.StatusCode == http.StatusNotImplemented || (resp.StatusCode >= http.StatusBadRequest && resp.StatusCode <= http.StatusInternalServerError) {
 		return &APIError{
 			StatusCode: resp.StatusCode,
 			StatusText: http.StatusText(resp.StatusCode),
