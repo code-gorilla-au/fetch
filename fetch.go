@@ -103,9 +103,12 @@ func call(url string, method string, body io.Reader, client httpClient, headers 
 	if err != nil {
 		return resp, err
 	}
-	fmt.Println(resp)
-	// non recoverable status codes
-	err = validateStatusCodes(resp)
+	if resp.StatusCode > 399 {
+		return resp, &APIError{
+			StatusCode: resp.StatusCode,
+			StatusText: http.StatusText(resp.StatusCode),
+		}
+	}
 	return resp, err
 }
 
@@ -123,6 +126,9 @@ func callWithRetry(url string, method string, body io.Reader, client httpClient,
 		resp, err = call(url, method, body, client, headers...)
 		if err == nil {
 			return resp, nil
+		}
+		if !isRecoverable(err) {
+			return resp, err
 		}
 		fmt.Printf("%s: http %s request error [%s], will retry in [%s]", logPrefix, method, err, retryWait)
 		time.Sleep(retryWait)
@@ -142,21 +148,20 @@ func mergeHeaders(headersList ...map[string]string) map[string]string {
 	return mergedHeaders
 }
 
-func validateStatusCodes(resp *http.Response) error {
-	if resp.StatusCode == 0 || resp.StatusCode > 599 {
-		return &APIError{
-			Message:    "unexpected http status",
-			StatusCode: resp.StatusCode,
-			StatusText: "Unexpected",
-		}
+func isRecoverable(err error) bool {
+	var apiError *APIError
+	if !errors.As(err, &apiError) {
+		return false
 	}
 
-	if resp.StatusCode == http.StatusNotImplemented || (resp.StatusCode >= http.StatusBadRequest && resp.StatusCode <= http.StatusInternalServerError) {
-		return &APIError{
-			StatusCode: resp.StatusCode,
-			StatusText: http.StatusText(resp.StatusCode),
-		}
+	switch {
+	case apiError.StatusCode == http.StatusNotImplemented:
+		return false
+	case (apiError.StatusCode >= http.StatusBadRequest && apiError.StatusCode < http.StatusInternalServerError):
+		return false
+	case apiError.StatusCode == 0, apiError.StatusCode > 599:
+		return false
 	}
 
-	return nil
+	return true
 }

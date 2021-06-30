@@ -57,6 +57,29 @@ func Test_call_POST_4xx_should_return_error(t *testing.T) {
 	assert.ErrorAs(t, err, &expectedErr)
 }
 
+func Test_call_POST_5xx_should_return_error(t *testing.T) {
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			StatusCode: http.StatusInternalServerError,
+		},
+	}
+
+	expectedHeaders := map[string]string{
+		"Auth": "/app/json",
+	}
+
+	url := "foo"
+
+	var expectedErr *APIError
+
+	_, err := call(url, http.MethodPost, nil, &m, expectedHeaders)
+	if err == nil {
+		t.Error("expected error, got none")
+		return
+	}
+	assert.ErrorAs(t, err, &expectedErr)
+}
+
 func Test_call_GET_should_not_return_error_and_match_req(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
@@ -186,7 +209,7 @@ func Test_call_should_should_return_error(t *testing.T) {
 	assert.ErrorIs(t, err, m.Err)
 }
 
-func Test_callWithRetry_should_return_error(t *testing.T) {
+func Test_callWithRetry_client_error_should_return_error(t *testing.T) {
 	m := MockHTTPClient{
 		ErrDo: true,
 		Err:   errors.New("expected error"),
@@ -194,6 +217,30 @@ func Test_callWithRetry_should_return_error(t *testing.T) {
 
 	_, err := callWithRetry("", http.MethodPost, nil, &m, []time.Duration{1 * time.Nanosecond})
 	assert.ErrorIs(t, err, m.Err)
+}
+
+func Test_callWithRetry_4xx_client_error_should_return_error(t *testing.T) {
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			StatusCode: http.StatusBadRequest,
+		},
+	}
+	var apiErr *APIError
+	_, err := callWithRetry("", http.MethodPost, nil, &m, []time.Duration{1 * time.Nanosecond})
+	assert.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, 1, m.Retries)
+}
+
+func Test_callWithRetry_5xx_client_error_retry_and_should_return_error(t *testing.T) {
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			StatusCode: http.StatusInternalServerError,
+		},
+	}
+	var apiErr *APIError
+	_, err := callWithRetry("", http.MethodPost, nil, &m, []time.Duration{1 * time.Nanosecond, 1 * time.Nanosecond})
+	assert.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, 2, m.Retries)
 }
 
 func Test_callWithRetry_no_retries_should_return_error(t *testing.T) {
