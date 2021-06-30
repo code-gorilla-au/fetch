@@ -219,7 +219,8 @@ func Test_callWithRetry_nill_retries_should_return_error(t *testing.T) {
 func Test_callWithRetry_should_return_response(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
-			Status: http.StatusText(http.StatusOK),
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
 		},
 	}
 
@@ -232,7 +233,8 @@ func Test_callWithRetry_should_return_response(t *testing.T) {
 func TestAxios_Patch_no_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
-			Status: http.StatusText(http.StatusOK),
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
 		},
 	}
 
@@ -258,7 +260,8 @@ func TestAxios_Patch_no_retry(t *testing.T) {
 func TestAxios_Patch_no_retry_with_default_and_normal_headers(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
-			Status: http.StatusText(http.StatusOK),
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
 		},
 	}
 
@@ -290,7 +293,8 @@ func TestAxios_Patch_no_retry_with_default_and_normal_headers(t *testing.T) {
 func TestAxios_Patch_with_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
-			Status: http.StatusText(http.StatusOK),
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
 		},
 	}
 
@@ -311,7 +315,8 @@ func TestAxios_Patch_with_retry(t *testing.T) {
 func TestAxios_Delete_no_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
-			Status: http.StatusText(http.StatusOK),
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
 		},
 	}
 
@@ -332,7 +337,8 @@ func TestAxios_Delete_no_retry(t *testing.T) {
 func TestAxios_Delete_with_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
-			Status: http.StatusText(http.StatusOK),
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
 		},
 	}
 
@@ -353,7 +359,8 @@ func TestAxios_Delete_with_retry(t *testing.T) {
 func TestAxios_Delete_with_retry_with_default_and_normal_headers(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
-			Status: http.StatusText(http.StatusOK),
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
 		},
 	}
 
@@ -385,7 +392,8 @@ func TestAxios_Delete_with_retry_with_default_and_normal_headers(t *testing.T) {
 func TestAxios_Put_no_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
-			Status: http.StatusText(http.StatusOK),
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
 		},
 	}
 
@@ -406,7 +414,8 @@ func TestAxios_Put_no_retry(t *testing.T) {
 func TestAxios_Put_with_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
-			Status: http.StatusText(http.StatusOK),
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
 		},
 	}
 
@@ -427,7 +436,8 @@ func TestAxios_Put_with_retry(t *testing.T) {
 func TestAxios_Put_with_retry_with_default_and_normal_headers(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
-			Status: http.StatusText(http.StatusOK),
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
 		},
 	}
 
@@ -459,7 +469,8 @@ func TestAxios_Put_with_retry_with_default_and_normal_headers(t *testing.T) {
 func TestAxios_Get_with_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
-			Status: http.StatusText(http.StatusOK),
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
 		},
 	}
 
@@ -479,7 +490,8 @@ func TestAxios_Get_with_retry(t *testing.T) {
 func TestAxios_Get_no_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
-			Status: http.StatusText(http.StatusOK),
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
 		},
 	}
 
@@ -500,7 +512,8 @@ func TestAxios_Get_no_retry(t *testing.T) {
 func TestAxios_Get_no_retry_with_default_and_normal_headers(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
-			Status: http.StatusText(http.StatusOK),
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
 		},
 	}
 
@@ -532,7 +545,8 @@ func TestAxios_Get_no_retry_with_default_and_normal_headers(t *testing.T) {
 func TestAxios_Post_with_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
-			Status: http.StatusText(http.StatusOK),
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
 		},
 	}
 
@@ -553,7 +567,8 @@ func TestAxios_Post_with_retry(t *testing.T) {
 func TestAxios_Post_no_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
-			Status: http.StatusText(http.StatusOK),
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
 		},
 	}
 
@@ -574,7 +589,8 @@ func TestAxios_Post_no_retry(t *testing.T) {
 func TestAxios_Post_no_retry_with_default_and_normal_headers(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
-			Status: http.StatusText(http.StatusOK),
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
 		},
 	}
 
