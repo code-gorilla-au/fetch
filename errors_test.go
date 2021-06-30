@@ -66,3 +66,16 @@ func TestAPIError_Unwrap_should_match(t *testing.T) {
 		t.Error("non matching error")
 	}
 }
+
+func TestAPIError_errors_is(t *testing.T) {
+	fn := func() error {
+		return &APIError{
+			StatusCode: http.StatusOK,
+		}
+	}
+	expected := APIError{
+		StatusCode: http.StatusOK,
+	}
+	err := fn()
+	assert.Equal(t, err.Error(), expected.Error())
+}
