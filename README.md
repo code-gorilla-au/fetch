@@ -2,10 +2,12 @@
 
 simple http client with a basic retry / back off strategy
 
-- 1 seconds
-- 3 seconds
-- 5 seconds
-- 10 seconds
+## Features
+
+- default retry / back off strategy 1 seconds, 3 seconds, 5 seconds, 10 seconds
+- set default headers for every request
+- can add additional headers for individual requests
+- response codes > 399 are treated as errors (fetch.APIError)
 
 ## Examples
 
