@@ -19,9 +19,6 @@ resp, err := fetch.Get("https://icanhazdadjoke.com/", nil)
 if err != nil {
     os.Exit(1)
 }
-if resp.statusCode == http.StatusBadRequest {
-    os.Exit(1)
-}
 
 ```
 
@@ -36,9 +33,6 @@ headers := map[string]string{
 fetch := fetch.New()
 resp, err := fetch.Get("https://icanhazdadjoke.com/", headers)
 if err != nil {
-    os.Exit(1)
-}
-if resp.statusCode == http.StatusBadRequest {
     os.Exit(1)
 }
 
@@ -60,9 +54,6 @@ options := fetch.Options{
 fetch := fetch.New(options)
 resp, err := fetch.Get("https://icanhazdadjoke.com/", nil)
 if err != nil {
-    os.Exit(1)
-}
-if resp.statusCode == http.StatusBadRequest {
     os.Exit(1)
 }
 
