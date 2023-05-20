@@ -24,6 +24,9 @@ func WithOpts(opts ...FnOpts) *Options {
 	o := Options{}
 
 	for _, fn := range opts {
+		if fn == nil {
+			continue
+		}
 		err := fn(&o)
 		if err != nil {
 			panic("Error setting functional option")
