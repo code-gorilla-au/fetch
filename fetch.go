@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -122,17 +123,24 @@ func callWithRetry(url string, method string, body io.Reader, client httpClient,
 		return resp, ErrNoValidRetryStrategy
 	}
 
-	for _, retryWait := range retryStrategy {
-		resp, err = call(url, method, body, client, headers...)
-		if err == nil {
-			return resp, nil
+	waitGroup := sync.WaitGroup{}
+
+	waitGroup.Add(1)
+
+	go func() {
+		for _, retryWait := range retryStrategy {
+			resp, err = call(url, method, body, client, headers...)
+			if err == nil || !isRecoverable(err) {
+				break
+			}
+
+			fmt.Printf("%s: http %s request error [%s], will retry in [%s]", logPrefix, method, err, retryWait)
+			time.Sleep(retryWait)
 		}
-		if !isRecoverable(err) {
-			return resp, err
-		}
-		fmt.Printf("%s: http %s request error [%s], will retry in [%s]", logPrefix, method, err, retryWait)
-		time.Sleep(retryWait)
-	}
+		waitGroup.Done()
+	}()
+
+	waitGroup.Wait()
 
 	return resp, err
 }
