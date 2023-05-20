@@ -42,7 +42,7 @@ func (a *Client) Patch(url string, body io.Reader, headers map[string]string) (*
 	return a.do(url, http.MethodPatch, body, headers)
 }
 
-// do - make http call
+// do - make http call with provided configuration
 func (a *Client) do(url string, method string, body io.Reader, headers map[string]string) (*http.Response, error) {
 	if a.RetryStrategy == nil {
 		return call(url, method, body, a.Client, headers, a.DefaultHeaders)
@@ -86,31 +86,37 @@ func call(url string, method string, body io.Reader, client httpClient, headers 
 	if err != nil {
 		return &http.Response{}, err
 	}
+
 	allHeaders := mergeHeaders(headers...)
 	for key, value := range allHeaders {
 		req.Header.Add(key, value)
 	}
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return resp, err
 	}
+
 	if resp.StatusCode > 399 {
 		return resp, &APIError{
 			StatusCode: resp.StatusCode,
 			StatusText: http.StatusText(resp.StatusCode),
 		}
 	}
+
 	return resp, err
 }
 
 // mergeHeaders - merge a slice of headers
 func mergeHeaders(headersList ...map[string]string) map[string]string {
 	mergedHeaders := map[string]string{}
+
 	for _, headers := range headersList {
 		for key, value := range headers {
 			mergedHeaders[key] = value
 		}
 	}
+
 	return mergedHeaders
 }
 
