@@ -676,6 +676,14 @@ func TestNew_with_default_header(t *testing.T) {
 	assert.Equal(t, axios.DefaultHeaders, setDefaultFetch().DefaultHeaders)
 }
 
+func TestNew_with_functional_options(t *testing.T) {
+	expected := []time.Duration{1, 2}
+	axios := New(WithOpts(
+		WithRetryStrategy(&expected),
+	))
+	assert.Equal(t, axios.RetryStrategy, expected)
+}
+
 func TestNew_with_options_headers(t *testing.T) {
 	options := Options{
 		WithRetry: false,

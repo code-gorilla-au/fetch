@@ -1,7 +1,12 @@
 package fetch
 
 import (
+	"errors"
 	"fmt"
+)
+
+var (
+	ErrNoValidRetryStrategy = errors.New("no valid retry strategy")
 )
 
 type APIError struct {
