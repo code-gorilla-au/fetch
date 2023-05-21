@@ -24,11 +24,11 @@ func New(options *Options) *Client {
 	}
 
 	// overrides
-	if fetch.Client != nil {
+	if options.HTTPClient != nil {
 		fetch.Client = options.HTTPClient
 	}
 
-	if fetch.RetryStrategy != nil {
+	if options.RetryStrategy != nil {
 		fetch.RetryStrategy = *options.RetryStrategy
 	}
 

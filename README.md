@@ -4,15 +4,21 @@ simple http client with a basic retry / back off strategy
 
 ## Features
 
-- default retry / back off strategy 1 seconds, 3 seconds, 5 seconds, 10 seconds
-- set default headers for every request
-- can add additional headers for individual requests
-- response codes > 399 are treated as errors (fetch.APIError)
+- Default retry / back off strategy 1 seconds, 3 seconds, 5 seconds, 10 seconds
+- Provide optional custom retry strategy
+- Provide optional HTTP client
+- Set default headers for every request
+- Add additional headers for individual requests
+- Response codes > 399 are treated as errors (fetch.APIError)
+
+<br>
+<br>
 
 ## Examples
 
 - demo [dad jokes](cmd/dad_jokes/dad_jokes.go)
 
+<br>
 
 ### fetch basic example
 
@@ -34,6 +40,8 @@ if err != nil {
 }
 
 ```
+
+<br>
 
 ### fetch with headers
 
@@ -59,6 +67,7 @@ if err != nil {
 
 ```
 
+<br>
 
 ### fetch with default headers
 
@@ -87,6 +96,35 @@ if err != nil {
 }
 
 ```
+
+<br>
+<br>
+
+## Using functional options
+
+<br>
+<br>
+
+```go
+fetch := fetch.New(WithOpts(
+    /** ... more options */
+    WithRetryStrategy(&[]time.Duration{1, 2}),
+))
+
+```
+
+### Available options
+
+| option | description |
+| ------- | ----------- |
+| WithDefaultRetryStrategy | Use default retry strategy            |
+| WithHeaders              | Set default headers for every request |
+| WithRetryStrategy        | Provide custom retry strategy         | 
+| WithHTTPClient           | Provide custom http client            | 
+
+
+<br>
+<br>
 
 ## TODO
 

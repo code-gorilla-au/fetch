@@ -36,9 +36,26 @@ func WithOpts(opts ...FnOpts) *Options {
 	return &o
 }
 
+// WithDefaultRetry - use client default retry strategy
+func WithDefaultRetryStrategy() FnOpts {
+	return func(o *Options) error {
+		o.WithRetry = true
+		return nil
+	}
+}
+
+// WithHeaders - Set headers that will be sent every request.
+func WithHeaders(headers map[string]string) FnOpts {
+	return func(o *Options) error {
+		o.DefaultHeaders = headers
+		return nil
+	}
+}
+
 // WithRetryStrategy - set custom retry strategy
 func WithRetryStrategy(strategy *[]time.Duration) FnOpts {
 	return func(o *Options) error {
+		o.WithRetry = true
 		o.RetryStrategy = strategy
 		return nil
 	}

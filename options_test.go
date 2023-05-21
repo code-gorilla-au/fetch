@@ -25,6 +25,7 @@ func TestWithRetryStrategy_with_custom_strategy(t *testing.T) {
 	err := fn(&options)
 	assert.NoError(t, err)
 	assert.Equal(t, &st, options.RetryStrategy)
+	assert.True(t, options.WithRetry)
 }
 
 func TestWithHTTPClient_with_nil_client(t *testing.T) {
@@ -53,7 +54,7 @@ func TestWithOpts_no_options(t *testing.T) {
 
 func TestWithOpts_with_custom_retry(t *testing.T) {
 	st := []time.Duration{1, 2}
-	options := WithOpts(WithRetryStrategy(&st))
+	options := WithOpts(WithRetryStrategy(&[]time.Duration{1, 2}))
 	assert.Equal(t, &st, options.RetryStrategy)
 	assert.Nil(t, options.HTTPClient)
 }
