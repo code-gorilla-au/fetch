@@ -10,15 +10,28 @@ import (
 )
 
 func New(options *Options) *Client {
-	var fetch Client
+
 	if options == nil {
 		return setDefaultFetch()
 	}
+
+	// defaults
+	var fetch Client
+	fetch.DefaultHeaders = options.DefaultHeaders
+	fetch.Client = setDefaultClient()
 	if options.WithRetry {
 		fetch.RetryStrategy = setDefaultRetryStrategy()
 	}
-	fetch.DefaultHeaders = options.DefaultHeaders
-	fetch.Client = setDefaultClient()
+
+	// overrides
+	if fetch.Client != nil {
+		fetch.Client = options.HTTPClient
+	}
+
+	if fetch.RetryStrategy != nil {
+		fetch.RetryStrategy = *options.RetryStrategy
+	}
+
 	return &fetch
 }
 
