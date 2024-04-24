@@ -1,20 +1,38 @@
 .DEFAULT_GOAL := help
 
-test: ## Test
-	go test -cover -short -failfast ./...
+COMMIT := $(shell git rev-parse --short HEAD)
+BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+DATE := $(shell date +%Y-%m-%d-%H-%M-%S)
+APP_NAME := $(shell basename `git rev-parse --show-toplevel`)
 
+# Load env properties , db name, port, etc.
+# nb: You can change the default config with `make ENV_CONTEXT=".env.uat" `
+ENV_CONTEXT ?= .env.local
+ENV_CONTEXT_PATH:=$(PROJECT_ROOT)/$(ENV_CONTEXT)
 
-scan: fmt vet ## run security scan
-	gosec ./...
+## Override any default values in the parent .env, with your own
+-include $(ENV_CONTEXT_PATH)
 
-fmt: ## run go fmt
-	go fmt ./...
+MAKE_LIB:=$(PROJECT_ROOT)/scripts
+-include $(MAKE_LIB)/tests.mk
+-include $(MAKE_LIB)/lints.mk
+-include $(MAKE_LIB)/logs.mk
+-include $(MAKE_LIB)/tools.mk
 
-vet: ## run go vet
-	go vet ./...
+#####################
+##@ CI
+#####################
 
-# HELP
-# This will output the help for each task
-# thanks to https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
-help: ## This help.
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)	
+ci: log test lint scan ## Run CI tasks
+
+install-ci: tools-scan ## install tools for CI only
+
+#####################
+##@ Dev
+#####################
+
+build: ## build go files
+	go build $(GO_BUILD_FLAGS) -o $(APP_NAME)
+
+install: tools-all ## install golang / node dependencies
+
