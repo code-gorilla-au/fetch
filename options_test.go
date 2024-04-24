@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/code-gorilla-au/odize"
 )
 
 func TestWithRetryStrategy_with_nil_strategy(t *testing.T) {
@@ -13,8 +13,8 @@ func TestWithRetryStrategy_with_nil_strategy(t *testing.T) {
 
 	options := Options{}
 	err := fn(&options)
-	assert.NoError(t, err)
-	assert.Nil(t, options.RetryStrategy)
+	odize.AssertNoError(t, err)
+	odize.AssertNil(t, options.RetryStrategy)
 }
 
 func TestWithRetryStrategy_with_custom_strategy(t *testing.T) {
@@ -23,9 +23,9 @@ func TestWithRetryStrategy_with_custom_strategy(t *testing.T) {
 
 	options := Options{}
 	err := fn(&options)
-	assert.NoError(t, err)
-	assert.Equal(t, &st, options.RetryStrategy)
-	assert.True(t, options.WithRetry)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, &st, options.RetryStrategy)
+	odize.AssertTrue(t, options.WithRetry)
 }
 
 func TestWithHTTPClient_with_nil_client(t *testing.T) {
@@ -33,8 +33,8 @@ func TestWithHTTPClient_with_nil_client(t *testing.T) {
 
 	options := Options{}
 	err := fn(&options)
-	assert.NoError(t, err)
-	assert.Nil(t, options.HTTPClient)
+	odize.AssertNoError(t, err)
+	odize.AssertNil(t, options.HTTPClient)
 }
 
 func TestWithHTTPClient_with_custom_client(t *testing.T) {
@@ -42,26 +42,26 @@ func TestWithHTTPClient_with_custom_client(t *testing.T) {
 
 	options := Options{}
 	err := fn(&options)
-	assert.NoError(t, err)
-	assert.Equal(t, &http.Client{}, options.HTTPClient)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, &http.Client{}, options.HTTPClient)
 }
 
 func TestWithOpts_no_options(t *testing.T) {
 	options := WithOpts(nil)
-	assert.Nil(t, options.HTTPClient)
-	assert.Nil(t, options.RetryStrategy)
+	odize.AssertNil(t, options.HTTPClient)
+	odize.AssertNil(t, options.RetryStrategy)
 }
 
 func TestWithOpts_with_custom_retry(t *testing.T) {
 	st := []time.Duration{1, 2}
 	options := WithOpts(WithRetryStrategy(&[]time.Duration{1, 2}))
-	assert.Equal(t, &st, options.RetryStrategy)
-	assert.Nil(t, options.HTTPClient)
+	odize.AssertEqual(t, &st, options.RetryStrategy)
+	odize.AssertNil(t, options.HTTPClient)
 }
 
 func TestWithOpts_with_custom_client(t *testing.T) {
 	cl := http.Client{}
 	options := WithOpts(WithHTTPClient(&cl))
-	assert.Equal(t, &cl, options.HTTPClient)
-	assert.Nil(t, options.RetryStrategy)
+	odize.AssertEqual(t, &cl, options.HTTPClient)
+	odize.AssertNil(t, options.RetryStrategy)
 }
