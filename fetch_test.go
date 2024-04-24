@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/code-gorilla-au/odize"
 )
 
 func Test_call_POST_should_not_return_error_and_match_req(t *testing.T) {
@@ -25,12 +25,12 @@ func Test_call_POST_should_not_return_error_and_match_req(t *testing.T) {
 	url := "foo"
 
 	_, err := call(url, http.MethodPost, nil, &m, expectedHeaders)
-	assert.NoError(t, err)
+	odize.AssertNoError(t, err)
 	for key, value := range expectedHeaders {
-		assert.Equal(t, m.Req.Header.Get(key), value)
+		odize.AssertEqual(t, m.Req.Header.Get(key), value)
 	}
-	assert.Equal(t, m.Req.URL.String(), url)
-	assert.Equal(t, m.Req.Method, http.MethodPost)
+	odize.AssertEqual(t, m.Req.URL.String(), url)
+	odize.AssertEqual(t, m.Req.Method, http.MethodPost)
 
 }
 
@@ -54,7 +54,7 @@ func Test_call_POST_4xx_should_return_error(t *testing.T) {
 		t.Error("expected error, got none")
 		return
 	}
-	assert.ErrorAs(t, err, &expectedErr)
+	odize.AssertTrue(t, errors.As(err, &expectedErr))
 }
 
 func Test_call_POST_5xx_should_return_error(t *testing.T) {
@@ -77,7 +77,7 @@ func Test_call_POST_5xx_should_return_error(t *testing.T) {
 		t.Error("expected error, got none")
 		return
 	}
-	assert.ErrorAs(t, err, &expectedErr)
+	odize.AssertTrue(t, errors.As(err, &expectedErr))
 }
 
 func Test_call_GET_should_not_return_error_and_match_req(t *testing.T) {
@@ -94,12 +94,12 @@ func Test_call_GET_should_not_return_error_and_match_req(t *testing.T) {
 	url := "foo"
 
 	_, err := call(url, http.MethodGet, nil, &m, expectedHeaders)
-	assert.NoError(t, err)
+	odize.AssertNoError(t, err)
 	for key, value := range expectedHeaders {
-		assert.Equal(t, m.Req.Header.Get(key), value)
+		odize.AssertEqual(t, m.Req.Header.Get(key), value)
 	}
-	assert.Equal(t, m.Req.URL.String(), url)
-	assert.Equal(t, m.Req.Method, http.MethodGet)
+	odize.AssertEqual(t, m.Req.URL.String(), url)
+	odize.AssertEqual(t, m.Req.Method, http.MethodGet)
 
 }
 func Test_call_PUT_should_not_return_error_and_match_req(t *testing.T) {
@@ -116,12 +116,12 @@ func Test_call_PUT_should_not_return_error_and_match_req(t *testing.T) {
 	url := "foo"
 
 	_, err := call(url, http.MethodPut, nil, &m, expectedHeaders)
-	assert.NoError(t, err)
+	odize.AssertNoError(t, err)
 	for key, value := range expectedHeaders {
-		assert.Equal(t, m.Req.Header.Get(key), value)
+		odize.AssertEqual(t, m.Req.Header.Get(key), value)
 	}
-	assert.Equal(t, m.Req.URL.String(), url)
-	assert.Equal(t, m.Req.Method, http.MethodPut)
+	odize.AssertEqual(t, m.Req.URL.String(), url)
+	odize.AssertEqual(t, m.Req.Method, http.MethodPut)
 
 }
 
@@ -139,12 +139,12 @@ func Test_call_PATCH_should_not_return_error_and_match_req(t *testing.T) {
 	url := "foo"
 
 	_, err := call(url, http.MethodPatch, nil, &m, expectedHeaders)
-	assert.NoError(t, err)
+	odize.AssertNoError(t, err)
 	for key, value := range expectedHeaders {
-		assert.Equal(t, m.Req.Header.Get(key), value)
+		odize.AssertEqual(t, m.Req.Header.Get(key), value)
 	}
-	assert.Equal(t, m.Req.URL.String(), url)
-	assert.Equal(t, m.Req.Method, http.MethodPatch)
+	odize.AssertEqual(t, m.Req.URL.String(), url)
+	odize.AssertEqual(t, m.Req.Method, http.MethodPatch)
 
 }
 
@@ -162,12 +162,12 @@ func Test_call_DELETE_should_not_return_error_and_match_req(t *testing.T) {
 	url := "foo"
 
 	_, err := call(url, http.MethodDelete, nil, &m, expectedHeaders)
-	assert.NoError(t, err)
+	odize.AssertNoError(t, err)
 	for key, value := range expectedHeaders {
-		assert.Equal(t, m.Req.Header.Get(key), value)
+		odize.AssertEqual(t, m.Req.Header.Get(key), value)
 	}
-	assert.Equal(t, m.Req.URL.String(), url)
-	assert.Equal(t, m.Req.Method, http.MethodDelete)
+	odize.AssertEqual(t, m.Req.URL.String(), url)
+	odize.AssertEqual(t, m.Req.Method, http.MethodDelete)
 
 }
 
@@ -179,17 +179,17 @@ func Test_call_body_should_match(t *testing.T) {
 	}
 
 	data, err := json.Marshal(&body)
-	assert.NoError(t, err)
+	odize.AssertNoError(t, err)
 
 	url := "foo"
 
 	_, err = call(url, http.MethodPost, bytes.NewReader(data), &m, body)
-	assert.NoError(t, err)
+	odize.AssertNoError(t, err)
 
 	test := map[string]string{}
 	err = json.NewDecoder(m.Req.Body).Decode(&test)
-	assert.NoError(t, err)
-	assert.Equal(t, test, body)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, test, body)
 
 }
 
@@ -206,7 +206,7 @@ func Test_call_should_should_return_error(t *testing.T) {
 	url := "foo"
 
 	_, err := call(url, http.MethodPost, nil, &m, expectedHeaders)
-	assert.ErrorIs(t, err, m.Err)
+	odize.AssertTrue(t, errors.Is(err, m.Err))
 }
 
 func Test_callWithRetry_client_error_should_return_error(t *testing.T) {
@@ -216,7 +216,7 @@ func Test_callWithRetry_client_error_should_return_error(t *testing.T) {
 	}
 
 	_, err := callWithRetry("", http.MethodPost, nil, &m, []time.Duration{1 * time.Nanosecond})
-	assert.ErrorIs(t, err, m.Err)
+	odize.AssertTrue(t, errors.Is(err, m.Err))
 }
 
 func Test_callWithRetry_4xx_client_error_should_return_error(t *testing.T) {
@@ -227,8 +227,8 @@ func Test_callWithRetry_4xx_client_error_should_return_error(t *testing.T) {
 	}
 	var apiErr *APIError
 	_, err := callWithRetry("", http.MethodPost, nil, &m, []time.Duration{1 * time.Nanosecond})
-	assert.ErrorAs(t, err, &apiErr)
-	assert.Equal(t, 1, m.Retries)
+	odize.AssertTrue(t, errors.As(err, &apiErr))
+	odize.AssertEqual(t, 1, m.Retries)
 }
 
 func Test_callWithRetry_5xx_client_error_retry_and_should_return_error(t *testing.T) {
@@ -239,8 +239,9 @@ func Test_callWithRetry_5xx_client_error_retry_and_should_return_error(t *testin
 	}
 	var apiErr *APIError
 	_, err := callWithRetry("", http.MethodPost, nil, &m, []time.Duration{1 * time.Nanosecond, 1 * time.Nanosecond})
-	assert.ErrorAs(t, err, &apiErr)
-	assert.Equal(t, 2, m.Retries)
+
+	odize.AssertTrue(t, errors.As(err, &apiErr))
+	odize.AssertEqual(t, 2, m.Retries)
 }
 
 func Test_callWithRetry_no_retries_should_return_error(t *testing.T) {
@@ -250,7 +251,7 @@ func Test_callWithRetry_no_retries_should_return_error(t *testing.T) {
 	}
 
 	_, err := callWithRetry("", http.MethodPost, nil, &m, []time.Duration{})
-	assert.ErrorIs(t, err, ErrNoValidRetryStrategy)
+	odize.AssertTrue(t, errors.Is(err, ErrNoValidRetryStrategy))
 }
 
 func Test_callWithRetry_nill_retries_should_return_error(t *testing.T) {
@@ -260,7 +261,7 @@ func Test_callWithRetry_nill_retries_should_return_error(t *testing.T) {
 	}
 
 	_, err := callWithRetry("", http.MethodPost, nil, &m, nil)
-	assert.ErrorIs(t, err, ErrNoValidRetryStrategy)
+	odize.AssertTrue(t, errors.Is(err, ErrNoValidRetryStrategy))
 }
 
 func Test_callWithRetry_should_return_response(t *testing.T) {
@@ -272,9 +273,9 @@ func Test_callWithRetry_should_return_response(t *testing.T) {
 	}
 
 	resp, err := callWithRetry("", http.MethodGet, nil, &m, []time.Duration{1 * time.Nanosecond})
-	assert.NoError(t, err, m.Err)
-	assert.Equal(t, resp, m.Resp)
-	assert.Equal(t, m.Req.Method, http.MethodGet)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, resp, m.Resp)
+	odize.AssertEqual(t, m.Req.Method, http.MethodGet)
 }
 
 func TestAxios_Patch_no_retry(t *testing.T) {
@@ -300,8 +301,8 @@ func TestAxios_Patch_no_retry(t *testing.T) {
 	}
 
 	resp, err := axios.Patch("", bytes.NewReader(nil), headers)
-	assert.NoError(t, err, m.Err)
-	assert.Equal(t, resp, m.Resp)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, resp, m.Resp)
 }
 
 func TestAxios_Patch_no_retry_with_default_and_normal_headers(t *testing.T) {
@@ -327,13 +328,13 @@ func TestAxios_Patch_no_retry_with_default_and_normal_headers(t *testing.T) {
 	}
 
 	resp, err := axios.Patch("", bytes.NewReader(nil), headers)
-	assert.NoError(t, err, m.Err)
-	assert.Equal(t, resp, m.Resp)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, resp, m.Resp)
 	for key, value := range defaultHeaders {
-		assert.Equal(t, m.Req.Header.Get(key), value)
+		odize.AssertEqual(t, m.Req.Header.Get(key), value)
 	}
 	for key, value := range headers {
-		assert.Equal(t, m.Req.Header.Get(key), value)
+		odize.AssertEqual(t, m.Req.Header.Get(key), value)
 	}
 }
 
@@ -355,8 +356,8 @@ func TestAxios_Patch_with_retry(t *testing.T) {
 	}
 
 	resp, err := axios.Patch("", bytes.NewReader(nil), headers)
-	assert.NoError(t, err, m.Err)
-	assert.Equal(t, resp, m.Resp)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, resp, m.Resp)
 }
 
 func TestAxios_Delete_no_retry(t *testing.T) {
@@ -377,8 +378,8 @@ func TestAxios_Delete_no_retry(t *testing.T) {
 	}
 
 	resp, err := axios.Delete("", bytes.NewReader(nil), headers)
-	assert.NoError(t, err, m.Err)
-	assert.Equal(t, resp, m.Resp)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, resp, m.Resp)
 }
 
 func TestAxios_Delete_with_retry(t *testing.T) {
@@ -399,8 +400,8 @@ func TestAxios_Delete_with_retry(t *testing.T) {
 	}
 
 	resp, err := axios.Delete("", bytes.NewReader(nil), headers)
-	assert.NoError(t, err, m.Err)
-	assert.Equal(t, resp, m.Resp)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, resp, m.Resp)
 }
 
 func TestAxios_Delete_with_retry_with_default_and_normal_headers(t *testing.T) {
@@ -426,13 +427,13 @@ func TestAxios_Delete_with_retry_with_default_and_normal_headers(t *testing.T) {
 	}
 
 	resp, err := axios.Delete("", bytes.NewReader(nil), headers)
-	assert.NoError(t, err, m.Err)
-	assert.Equal(t, resp, m.Resp)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, resp, m.Resp)
 	for key, value := range defaultHeaders {
-		assert.Equal(t, m.Req.Header.Get(key), value)
+		odize.AssertEqual(t, m.Req.Header.Get(key), value)
 	}
 	for key, value := range headers {
-		assert.Equal(t, m.Req.Header.Get(key), value)
+		odize.AssertEqual(t, m.Req.Header.Get(key), value)
 	}
 }
 
@@ -454,8 +455,8 @@ func TestAxios_Put_no_retry(t *testing.T) {
 	}
 
 	resp, err := axios.Put("", bytes.NewReader(nil), headers)
-	assert.NoError(t, err, m.Err)
-	assert.Equal(t, resp, m.Resp)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, resp, m.Resp)
 }
 
 func TestAxios_Put_with_retry(t *testing.T) {
@@ -476,8 +477,8 @@ func TestAxios_Put_with_retry(t *testing.T) {
 	}
 
 	resp, err := axios.Put("", bytes.NewReader(nil), headers)
-	assert.NoError(t, err, m.Err)
-	assert.Equal(t, resp, m.Resp)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, resp, m.Resp)
 }
 
 func TestAxios_Put_with_retry_with_default_and_normal_headers(t *testing.T) {
@@ -503,13 +504,13 @@ func TestAxios_Put_with_retry_with_default_and_normal_headers(t *testing.T) {
 	}
 
 	resp, err := axios.Put("", bytes.NewReader(nil), headers)
-	assert.NoError(t, err, m.Err)
-	assert.Equal(t, resp, m.Resp)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, resp, m.Resp)
 	for key, value := range defaultHeaders {
-		assert.Equal(t, m.Req.Header.Get(key), value)
+		odize.AssertEqual(t, m.Req.Header.Get(key), value)
 	}
 	for key, value := range headers {
-		assert.Equal(t, m.Req.Header.Get(key), value)
+		odize.AssertEqual(t, m.Req.Header.Get(key), value)
 	}
 }
 
@@ -531,8 +532,8 @@ func TestAxios_Get_with_retry(t *testing.T) {
 	}
 
 	resp, err := axios.Get("", headers)
-	assert.NoError(t, err, m.Err)
-	assert.Equal(t, resp, m.Resp)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, resp, m.Resp)
 }
 func TestAxios_Get_no_retry(t *testing.T) {
 	m := MockHTTPClient{
@@ -552,8 +553,8 @@ func TestAxios_Get_no_retry(t *testing.T) {
 	}
 
 	resp, err := axios.Get("", headers)
-	assert.NoError(t, err, m.Err)
-	assert.Equal(t, resp, m.Resp)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, resp, m.Resp)
 }
 
 func TestAxios_Get_no_retry_with_default_and_normal_headers(t *testing.T) {
@@ -579,13 +580,13 @@ func TestAxios_Get_no_retry_with_default_and_normal_headers(t *testing.T) {
 	}
 
 	resp, err := axios.Get("", headers)
-	assert.NoError(t, err, m.Err)
-	assert.Equal(t, resp, m.Resp)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, resp, m.Resp)
 	for key, value := range defaultHeaders {
-		assert.Equal(t, m.Req.Header.Get(key), value)
+		odize.AssertEqual(t, m.Req.Header.Get(key), value)
 	}
 	for key, value := range headers {
-		assert.Equal(t, m.Req.Header.Get(key), value)
+		odize.AssertEqual(t, m.Req.Header.Get(key), value)
 	}
 }
 
@@ -607,8 +608,8 @@ func TestAxios_Post_with_retry(t *testing.T) {
 	}
 
 	resp, err := axios.Post("", bytes.NewReader(nil), headers)
-	assert.NoError(t, err, m.Err)
-	assert.Equal(t, resp, m.Resp)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, resp, m.Resp)
 }
 
 func TestAxios_Post_no_retry(t *testing.T) {
@@ -629,8 +630,8 @@ func TestAxios_Post_no_retry(t *testing.T) {
 	}
 
 	resp, err := axios.Post("", bytes.NewReader(nil), headers)
-	assert.NoError(t, err, m.Err)
-	assert.Equal(t, resp, m.Resp)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, resp, m.Resp)
 }
 
 func TestAxios_Post_no_retry_with_default_and_normal_headers(t *testing.T) {
@@ -656,24 +657,24 @@ func TestAxios_Post_no_retry_with_default_and_normal_headers(t *testing.T) {
 	}
 
 	resp, err := axios.Post("", bytes.NewReader(nil), headers)
-	assert.NoError(t, err, m.Err)
-	assert.Equal(t, resp, m.Resp)
+	odize.AssertNoError(t, err)
+	odize.AssertEqual(t, resp, m.Resp)
 	for key, value := range defaultHeaders {
-		assert.Equal(t, m.Req.Header.Get(key), value)
+		odize.AssertEqual(t, m.Req.Header.Get(key), value)
 	}
 	for key, value := range headers {
-		assert.Equal(t, m.Req.Header.Get(key), value)
+		odize.AssertEqual(t, m.Req.Header.Get(key), value)
 	}
 }
 
 func TestNew_with_default_retry(t *testing.T) {
 	axios := New(nil)
-	assert.Equal(t, axios.RetryStrategy, setDefaultFetch().RetryStrategy)
+	odize.AssertEqual(t, axios.RetryStrategy, setDefaultFetch().RetryStrategy)
 }
 
 func TestNew_with_default_header(t *testing.T) {
 	axios := New(nil)
-	assert.Equal(t, axios.DefaultHeaders, setDefaultFetch().DefaultHeaders)
+	odize.AssertEqual(t, axios.DefaultHeaders, setDefaultFetch().DefaultHeaders)
 }
 
 func TestNew_with_functional_options(t *testing.T) {
@@ -681,7 +682,7 @@ func TestNew_with_functional_options(t *testing.T) {
 	axios := New(WithOpts(
 		WithRetryStrategy(&expected),
 	))
-	assert.Equal(t, axios.RetryStrategy, expected)
+	odize.AssertEqual(t, axios.RetryStrategy, expected)
 }
 
 func TestNew_with_options_headers(t *testing.T) {
@@ -692,7 +693,7 @@ func TestNew_with_options_headers(t *testing.T) {
 		},
 	}
 	axios := New(&options)
-	assert.Equal(t, axios.DefaultHeaders, options.DefaultHeaders)
+	odize.AssertEqual(t, axios.DefaultHeaders, options.DefaultHeaders)
 }
 
 func TestNew_with_options_no_retry(t *testing.T) {
@@ -703,14 +704,14 @@ func TestNew_with_options_no_retry(t *testing.T) {
 		},
 	}
 	axios := New(&options)
-	assert.Equal(t, axios.RetryStrategy, []time.Duration(nil))
+	odize.AssertEqual(t, axios.RetryStrategy, []time.Duration(nil))
 }
 func TestNew_with_options_with_retry(t *testing.T) {
 	options := Options{
 		WithRetry: true,
 	}
 	axios := New(&options)
-	assert.Equal(t, axios.RetryStrategy, setDefaultRetryStrategy())
+	odize.AssertEqual(t, axios.RetryStrategy, setDefaultRetryStrategy())
 }
 
 func Test_mergeHeaders_should_merge_correctly(t *testing.T) {
@@ -721,7 +722,7 @@ func Test_mergeHeaders_should_merge_correctly(t *testing.T) {
 
 	test := mergeHeaders(map[string]string{"foo": "bar"}, map[string]string{"bin": "baz"})
 
-	assert.Equal(t, expected, test)
+	odize.AssertEqual(t, expected, test)
 }
 
 func Test_mergeHeaders_empty_should_work(t *testing.T) {
@@ -729,5 +730,5 @@ func Test_mergeHeaders_empty_should_work(t *testing.T) {
 
 	test := mergeHeaders()
 
-	assert.Equal(t, expected, test)
+	odize.AssertEqual(t, expected, test)
 }
