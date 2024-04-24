@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/code-gorilla-au/odize"
 )
 
 func TestAPIError_Error(t *testing.T) {
@@ -61,7 +61,7 @@ func TestAPIError_Unwrap_should_match(t *testing.T) {
 	}
 	var testErr error = &expectedErr
 	if errors.As(testErr, &err) {
-		assert.Equal(t, err.Message, expectedErr.Message)
+		odize.AssertEqual(t, err.Message, expectedErr.Message)
 	} else {
 		t.Error("non matching error")
 	}
@@ -77,5 +77,5 @@ func TestAPIError_errors_is(t *testing.T) {
 		StatusCode: http.StatusOK,
 	}
 	err := fn()
-	assert.Equal(t, err.Error(), expected.Error())
+	odize.AssertEqual(t, err.Error(), expected.Error())
 }
