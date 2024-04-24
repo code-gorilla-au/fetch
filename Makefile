@@ -1,5 +1,6 @@
 .DEFAULT_GOAL := help
 
+PROJECT_ROOT:=$(shell git rev-parse --show-toplevel)
 COMMIT := $(shell git rev-parse --short HEAD)
 BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 DATE := $(shell date +%Y-%m-%d-%H-%M-%S)
