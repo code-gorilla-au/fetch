@@ -1,6 +1,6 @@
 module github.com/code-gorilla-au/fetch
 
-go 1.22.2
+go 1.22.4
 
 require github.com/code-gorilla-au/odize v1.3.1
 
