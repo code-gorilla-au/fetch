@@ -1,6 +1,6 @@
-github.com/code-gorilla-au/env v0.0.0-20231101054621-7a54afca2a47 h1:trs2A+qJC8TSCrwHjHo1RakFLSH4P3ExiQL+xg9dJp8=
-github.com/code-gorilla-au/env v0.0.0-20231101054621-7a54afca2a47/go.mod h1:UF4ViNLEMf471i3q0opnUR5fpw0ENIvveo92s0/h12Q=
-github.com/code-gorilla-au/odize v1.3.1 h1:/E+gQCW0CxeZpL+Q08Jz3m2F1JvOKuSmZGkzNvPRMtw=
-github.com/code-gorilla-au/odize v1.3.1/go.mod h1:orZUzigNMH4cXfBHx8BP+fTYiPdkCbaq+dsEFkpP7C0=
+github.com/code-gorilla-au/env v1.1.0 h1:Zxct3vh1+YgTN/VLba6h/1vX/xH0PdFQ7u2NMtrzdq0=
+github.com/code-gorilla-au/env v1.1.0/go.mod h1:KE4Ymfz5MhMi7SX3ZKH4iMFAHsDCvwOV8WTzgpwzzE4=
+github.com/code-gorilla-au/odize v1.3.2 h1:1bbqIceIU6vFfWgZSiJhFe+dOcBkH3f3gTOzEiZOzmk=
+github.com/code-gorilla-au/odize v1.3.2/go.mod h1:0pt82uHnHVDExQRwSX7QOFrKe4kuWwjVpS0LveULAoM=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
 github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
