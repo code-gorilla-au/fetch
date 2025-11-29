@@ -40,6 +40,7 @@ linters:
           - forbidigo
           - bodyclose
           - exhaustruct
+          - fatcontext
 
       - path: dad_jokes.go
         linters:
