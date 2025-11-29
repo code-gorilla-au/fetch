@@ -9,8 +9,6 @@ on:
     types: [opened, synchronize, reopened]
 
 
-env:
-  GOLANG_VERSION: 1.22
 
 jobs:
 
@@ -36,12 +34,10 @@ jobs:
           fetch-depth: 0
 
       - name: Setup golang ${{ env.GOLANG_VERSION }}
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v6
         with:
-          go-version: ${{ env.GOLANG_VERSION }}
-
-      - name: Fix "no such tool covdata" error
-        run: go env -w GOTOOLCHAIN=go1.25.0+auto
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
 
       - name: install tools
         run: make install-ci
