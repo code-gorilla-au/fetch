@@ -2,8 +2,8 @@ package fetch
 
 import (
 	"errors"
+	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"time"
 )
@@ -74,11 +74,12 @@ func (a *Client) callWithRetry(url string, method string, body io.Reader, retryS
 
 	for _, retryWait := range retryStrategy {
 		resp, err = a.call(url, method, body, headers...)
+
 		if err == nil || !isRecoverable(err) {
 			break
 		}
 
-		log.Printf("%s: http %s request error [%s], will retry in [%s]", logPrefix, method, err, retryWait)
+		fmt.Printf("%s: http %s request error [%s], will retry in [%s]", logPrefix, method, err, retryWait)
 		time.Sleep(retryWait)
 	}
 

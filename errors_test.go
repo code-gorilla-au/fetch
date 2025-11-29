@@ -26,7 +26,7 @@ func TestAPIError_Error(t *testing.T) {
 				StatusText: http.StatusText(http.StatusBadRequest),
 				Message:    "there was an issue with the request",
 			},
-			want: "Bad Request [400]: there was an issue with the request",
+			want: "Bad Request: [400]: there was an issue with the request",
 		},
 		{
 			name: "should return 5xx error",
@@ -35,7 +35,7 @@ func TestAPIError_Error(t *testing.T) {
 				StatusText: http.StatusText(http.StatusInternalServerError),
 				Message:    "there was an issue with the request",
 			},
-			want: "Internal Server Error [500]: there was an issue with the request",
+			want: "Internal Server Error: [500]: there was an issue with the request",
 		},
 	}
 	for _, tt := range tests {
@@ -78,4 +78,19 @@ func TestAPIError_errors_is(t *testing.T) {
 	}
 	err := fn()
 	odize.AssertEqual(t, err.Error(), expected.Error())
+}
+
+func TestAPIError_Unwrap(t *testing.T) {
+	var err *APIError
+	expectedErr := APIError{
+		StatusCode: http.StatusBadRequest,
+		StatusText: http.StatusText(http.StatusBadRequest),
+		Message:    "some issue",
+	}
+	var testErr error = &expectedErr
+	if errors.As(testErr, &err) {
+		odize.AssertEqual(t, err.Unwrap().Error(), expectedErr.Error())
+	} else {
+		t.Error("non matching error")
+	}
 }

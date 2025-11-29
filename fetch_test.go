@@ -321,7 +321,7 @@ func TestAxios_Get_no_retry_with_default_and_normal_headers(t *testing.T) {
 	}
 }
 
-func TestAxios_Post_with_retry(t *testing.T) {
+func TestAxios_Post_with_retry_response_status_ok(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
 			Status:     http.StatusText(http.StatusOK),
@@ -341,6 +341,48 @@ func TestAxios_Post_with_retry(t *testing.T) {
 	resp, err := axios.Post("", bytes.NewReader(nil), headers)
 	odize.AssertNoError(t, err)
 	odize.AssertEqual(t, resp, m.Resp)
+}
+
+func TestAxios_Post_with_retry_response_should_try_once(t *testing.T) {
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
+		},
+	}
+
+	headers := map[string]string{
+		"Content-Type": "application/json",
+	}
+
+	axios := &Client{
+		RetryStrategy: []time.Duration{1 * time.Nanosecond},
+		Client:        &m,
+	}
+
+	_, _ = axios.Post("", bytes.NewReader(nil), headers)
+	odize.AssertEqual(t, m.Retries, 1)
+}
+
+func TestAxios_Post_with_retry_response_should_try_twice(t *testing.T) {
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			Status:     http.StatusText(http.StatusGatewayTimeout),
+			StatusCode: http.StatusGatewayTimeout,
+		},
+	}
+
+	headers := map[string]string{
+		"Content-Type": "application/json",
+	}
+
+	axios := &Client{
+		RetryStrategy: []time.Duration{1 * time.Nanosecond, 1 * time.Nanosecond},
+		Client:        &m,
+	}
+
+	_, _ = axios.Post("", bytes.NewReader(nil), headers)
+	odize.AssertEqual(t, m.Retries, 2)
 }
 
 func TestAxios_Post_no_retry(t *testing.T) {
@@ -363,6 +405,27 @@ func TestAxios_Post_no_retry(t *testing.T) {
 	resp, err := axios.Post("", bytes.NewReader(nil), headers)
 	odize.AssertNoError(t, err)
 	odize.AssertEqual(t, resp, m.Resp)
+}
+
+func TestAxios_Post_empty_retry_list(t *testing.T) {
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
+		},
+	}
+
+	headers := map[string]string{
+		"Content-Type": "application/json",
+	}
+
+	axios := &Client{
+		RetryStrategy: []time.Duration{},
+		Client:        &m,
+	}
+
+	_, err := axios.Post("", bytes.NewReader(nil), headers)
+	odize.AssertError(t, err)
 }
 
 func TestAxios_Post_no_retry_with_default_and_normal_headers(t *testing.T) {
