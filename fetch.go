@@ -57,13 +57,13 @@ func (a *Client) Patch(url string, body io.Reader, headers map[string]string) (*
 // do - make http call with the provided configuration
 func (a *Client) do(url string, method string, body io.Reader, headers map[string]string) (*http.Response, error) {
 	if a.RetryStrategy == nil {
-		return call(url, method, body, a.Client, headers, a.DefaultHeaders)
+		return a.call(url, method, body, headers, a.DefaultHeaders)
 	}
-	return callWithRetry(url, method, body, a.Client, a.RetryStrategy, headers, a.DefaultHeaders)
+	return a.callWithRetry(url, method, body, a.RetryStrategy, headers, a.DefaultHeaders)
 }
 
 // callWithRetry - wrap the call method with the retry strategy
-func callWithRetry(url string, method string, body io.Reader, client httpClient, retryStrategy []time.Duration, headers ...map[string]string) (*http.Response, error) {
+func (a *Client) callWithRetry(url string, method string, body io.Reader, retryStrategy []time.Duration, headers ...map[string]string) (*http.Response, error) {
 	logPrefix := "fetch: callWithRetry"
 	var resp *http.Response
 	var err error
@@ -73,7 +73,7 @@ func callWithRetry(url string, method string, body io.Reader, client httpClient,
 	}
 
 	for _, retryWait := range retryStrategy {
-		resp, err = call(url, method, body, client, headers...)
+		resp, err = a.call(url, method, body, headers...)
 		if err == nil || !isRecoverable(err) {
 			break
 		}
@@ -86,7 +86,7 @@ func callWithRetry(url string, method string, body io.Reader, client httpClient,
 }
 
 // call - creates a new HTTP request and returns an HTTP response
-func call(url string, method string, body io.Reader, client httpClient, headers ...map[string]string) (*http.Response, error) {
+func (a *Client) call(url string, method string, body io.Reader, headers ...map[string]string) (*http.Response, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return &http.Response{}, err
@@ -97,7 +97,7 @@ func call(url string, method string, body io.Reader, client httpClient, headers 
 		req.Header.Add(key, value)
 	}
 
-	resp, err := client.Do(req)
+	resp, err := a.Client.Do(req)
 	if err != nil {
 		return resp, err
 	}
