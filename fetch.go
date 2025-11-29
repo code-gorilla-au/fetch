@@ -1,9 +1,10 @@
 package fetch
 
 import (
+	"context"
 	"errors"
-	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"time"
 )
@@ -59,27 +60,32 @@ func (a *Client) do(url string, method string, body io.Reader, headers map[strin
 	if a.RetryStrategy == nil {
 		return a.call(url, method, body, headers, a.DefaultHeaders)
 	}
-	return a.callWithRetry(url, method, body, a.RetryStrategy, headers, a.DefaultHeaders)
+
+	return a.callWithRetry(url, method, body, headers, a.DefaultHeaders)
 }
 
 // callWithRetry - wrap the call method with the retry strategy
-func (a *Client) callWithRetry(url string, method string, body io.Reader, retryStrategy []time.Duration, headers ...map[string]string) (*http.Response, error) {
+func (a *Client) callWithRetry(url string, method string, body io.Reader, headers ...map[string]string) (*http.Response, error) {
 	logPrefix := "fetch: callWithRetry"
 	var resp *http.Response
 	var err error
 
-	if len(retryStrategy) == 0 {
+	if len(a.RetryStrategy) == 0 {
 		return resp, ErrNoValidRetryStrategy
 	}
 
-	for _, retryWait := range retryStrategy {
+	for _, retryWait := range a.RetryStrategy {
 		resp, err = a.call(url, method, body, headers...)
 
 		if err == nil || !isRecoverable(err) {
+			if errors.Is(err, context.Canceled) {
+				log.Printf("%s: http %s request canceled", logPrefix, method)
+			}
+
 			break
 		}
 
-		fmt.Printf("%s: http %s request error [%s], will retry in [%s]", logPrefix, method, err, retryWait)
+		log.Printf("%s: http %s request error [%s], will retry in [%s]", logPrefix, method, err, retryWait)
 		time.Sleep(retryWait)
 	}
 
