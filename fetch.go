@@ -61,7 +61,7 @@ func (a *Client) Get(url string, headers map[string]string) (*http.Response, err
 //
 //	var apiErr *fetch.APIError
 //
-//	resp, err := client.Post(url, bytes.NewReader(`{"hello": "world"}`)
+//	resp, err := client.Post(url, bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
 //	if err != nil {
 //		if errors.As(err, &apiErr) {
 //			fmt.Println("API Response error", apiErr)
@@ -79,7 +79,7 @@ func (a *Client) Post(url string, body io.Reader, headers map[string]string) (*h
 //
 //	var apiErr *fetch.APIError
 //
-//	resp, err := client.Put(url, bytes.NewReader(`{"hello": "world"}`)
+//	resp, err := client.Put(url, bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
 //	if err != nil {
 //		if errors.As(err, &apiErr) {
 //			fmt.Println("API Response error", apiErr)
@@ -97,7 +97,7 @@ func (a *Client) Put(url string, body io.Reader, headers map[string]string) (*ht
 //
 //	var apiErr *fetch.APIError
 //
-//	resp, err := client.Delete(url, bytes.NewReader(`{"hello": "world"}`)
+//	resp, err := client.Delete(url, bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
 //	if err != nil {
 //		if errors.As(err, &apiErr) {
 //			fmt.Println("API Response error", apiErr)
@@ -114,7 +114,7 @@ func (a *Client) Delete(url string, body io.Reader, headers map[string]string) (
 //
 //	var apiErr *fetch.APIError
 //
-//	resp, err := client.Patch(url, bytes.NewReader(`{"hello": "world"}`)
+//	resp, err := client.Patch(url, bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
 //	if err != nil {
 //		if errors.As(err, &apiErr) {
 //			fmt.Println("API Response error", apiErr)
@@ -154,7 +154,7 @@ func (a *Client) GetCtx(ctx context.Context, url string, headers map[string]stri
 //	var apiErr *fetch.APIError
 //	ctx, cancel := context.WithCancel(context.Background())
 //
-//	resp, err := client.PostCtx(ctx,url, bytes.NewReader(`{"hello": "world"}`)
+//	resp, err := client.PostCtx(ctx,url, bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
 //	if err != nil {
 //		if errors.is(err, context.Canceled) {
 //			// Handle context cancelled
@@ -175,7 +175,7 @@ func (a *Client) PostCtx(ctx context.Context, url string, body io.Reader, header
 //	var apiErr *fetch.APIError
 //	ctx, cancel := context.WithCancel(context.Background())
 //
-//	resp, err := client.PutCtx(ctx,url, bytes.NewReader(`{"hello": "world"}`)
+//	resp, err := client.PutCtx(ctx,url, bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
 //	if err != nil {
 //		if errors.is(err, context.Canceled) {
 //			// Handle context cancelled
@@ -196,7 +196,7 @@ func (a *Client) PutCtx(ctx context.Context, url string, body io.Reader, headers
 //	var apiErr *fetch.APIError
 //	ctx, cancel := context.WithCancel(context.Background())
 //
-//	resp, err := client.DeleteCtx(ctx,url, bytes.NewReader(`{"hello": "world"}`)
+//	resp, err := client.DeleteCtx(ctx,url, bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
 //	if err != nil {
 //		if errors.is(err, context.Canceled) {
 //			// Handle context cancelled
@@ -217,7 +217,7 @@ func (a *Client) DeleteCtx(ctx context.Context, url string, body io.Reader, head
 //	var apiErr *fetch.APIError
 //	ctx, cancel := context.WithCancel(context.Background())
 //
-//	resp, err := client.PatchCtx(ctx,url, bytes.NewReader(`{"hello": "world"}`)
+//	resp, err := client.PatchCtx(ctx,url, bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
 //	if err != nil {
 //		if errors.is(err, context.Canceled) {
 //			// Handle context cancelled
@@ -279,6 +279,8 @@ func (a *Client) call(ctx context.Context, url string, method string, body io.Re
 	for key, value := range allHeaders {
 		req.Header.Add(key, value)
 	}
+
+	log.Println("request", req == nil)
 
 	resp, err := a.Client.Do(req)
 	if err != nil {

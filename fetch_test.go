@@ -2,6 +2,8 @@ package fetch
 
 import (
 	"bytes"
+	"context"
+	"errors"
 	"net/http"
 	"testing"
 	"time"
@@ -525,4 +527,92 @@ func Test_mergeHeaders_empty_should_work(t *testing.T) {
 	test := mergeHeaders()
 
 	odize.AssertEqual(t, expected, test)
+}
+
+func TestClient_context_methods(t *testing.T) {
+	group := odize.NewGroup(t, nil)
+
+	var c Client
+	var mock *MockHTTPClient
+	var ctx context.Context
+	var cancelFunc context.CancelFunc
+
+	group.BeforeEach(func() {
+		ctx, cancelFunc = context.WithTimeout(context.Background(), 1*time.Nanosecond)
+
+		mock = &MockHTTPClient{
+			Err:   context.Canceled,
+			ErrDo: true,
+			Resp: &http.Response{
+				Status:     http.StatusText(http.StatusOK),
+				StatusCode: http.StatusOK,
+			},
+		}
+
+		c = Client{Client: mock}
+	})
+
+	err := group.
+		Test("GetCtx cancel() should return error", func(t *testing.T) {
+
+			c = Client{
+				Client: mock,
+			}
+
+			cancelFunc()
+
+			_, err := c.GetCtx(ctx, "/https://google.com", nil)
+			odize.AssertTrue(t, errors.Is(err, context.Canceled))
+
+		}).
+		Test("PostCtx cancel() should return error", func(t *testing.T) {
+
+			c = Client{
+				Client: mock,
+			}
+
+			cancelFunc()
+
+			_, err := c.PostCtx(ctx, "/https://google.com", bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
+			odize.AssertTrue(t, errors.Is(err, context.Canceled))
+
+		}).
+		Test("PutCtx cancel() should return error", func(t *testing.T) {
+
+			c = Client{
+				Client: mock,
+			}
+
+			cancelFunc()
+
+			_, err := c.PutCtx(ctx, "/https://google.com", bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
+			odize.AssertTrue(t, errors.Is(err, context.Canceled))
+
+		}).
+		Test("DeleteCtx cancel() should return error", func(t *testing.T) {
+
+			c = Client{
+				Client: mock,
+			}
+
+			cancelFunc()
+
+			_, err := c.DeleteCtx(ctx, "/https://google.com", bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
+			odize.AssertTrue(t, errors.Is(err, context.Canceled))
+
+		}).
+		Test("PatchCtx cancel() should return error", func(t *testing.T) {
+
+			c = Client{
+				Client: mock,
+			}
+
+			cancelFunc()
+
+			_, err := c.PatchCtx(ctx, "/https://google.com", bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
+			odize.AssertTrue(t, errors.Is(err, context.Canceled))
+
+		}).
+		Run()
+	odize.AssertNoError(t, err)
 }
