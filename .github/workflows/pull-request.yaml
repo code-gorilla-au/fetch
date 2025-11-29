@@ -40,6 +40,9 @@ jobs:
         with:
           go-version: ${{ env.GOLANG_VERSION }}
 
+      - name: Fix "no such tool covdata" error
+        run: go env -w GOTOOLCHAIN=go1.25.0+auto
+
       - name: install tools
         run: make install-ci
 
