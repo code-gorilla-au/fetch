@@ -38,7 +38,13 @@ linters:
           - dupl
           - gosec
           - forbidigo
+          - bodyclose
           - exhaustruct
+
+      - path: dad_jokes.go
+        linters:
+          - forbidigo
+          - errchkjson
 
   settings:
     depguard:

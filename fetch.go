@@ -2,10 +2,9 @@ package fetch
 
 import (
 	"errors"
-	"fmt"
 	"io"
+	"log"
 	"net/http"
-	"sync"
 	"time"
 )
 
@@ -55,7 +54,7 @@ func (a *Client) Patch(url string, body io.Reader, headers map[string]string) (*
 	return a.do(url, http.MethodPatch, body, headers)
 }
 
-// do - make http call with provided configuration
+// do - make http call with the provided configuration
 func (a *Client) do(url string, method string, body io.Reader, headers map[string]string) (*http.Response, error) {
 	if a.RetryStrategy == nil {
 		return call(url, method, body, a.Client, headers, a.DefaultHeaders)
@@ -73,23 +72,16 @@ func callWithRetry(url string, method string, body io.Reader, client httpClient,
 		return resp, ErrNoValidRetryStrategy
 	}
 
-	waitGroup := sync.WaitGroup{}
-	waitGroup.Add(1)
-
-	go func() {
-		for _, retryWait := range retryStrategy {
-			resp, err = call(url, method, body, client, headers...)
-			if err == nil || !isRecoverable(err) {
-				break
-			}
-
-			fmt.Printf("%s: http %s request error [%s], will retry in [%s]", logPrefix, method, err, retryWait)
-			time.Sleep(retryWait)
+	for _, retryWait := range retryStrategy {
+		resp, err = call(url, method, body, client, headers...)
+		if err == nil || !isRecoverable(err) {
+			break
 		}
-		waitGroup.Done()
-	}()
 
-	waitGroup.Wait()
+		log.Printf("%s: http %s request error [%s], will retry in [%s]", logPrefix, method, err, retryWait)
+		time.Sleep(retryWait)
+	}
+
 	return resp, err
 }
 
