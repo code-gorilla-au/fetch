@@ -97,6 +97,28 @@ if err != nil {
 
 ```
 
+
+### Cancelable HTTP calls
+Use <method>Ctx if you want more granular control and the ability to cancel.
+
+```go
+	var apiErr *fetch.APIError
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	resp, err := client.PutCtx(ctx,url, bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
+	if err != nil {
+		if errors.is(err, context.Canceled) {
+			// Handle context cancelled
+		}
+		if errors.As(err, &apiErr) {
+			fmt.Println("API Response error", apiErr)
+		}
+		// Handle non-API Error
+	}
+```
+
+
 <br>
 <br>
 
