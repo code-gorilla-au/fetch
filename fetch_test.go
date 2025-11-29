@@ -2,7 +2,7 @@ package fetch
 
 import (
 	"bytes"
-	"encoding/json"
+	"context"
 	"errors"
 	"net/http"
 	"testing"
@@ -11,274 +11,7 @@ import (
 	"github.com/code-gorilla-au/odize"
 )
 
-func Test_call_POST_should_not_return_error_and_match_req(t *testing.T) {
-	m := MockHTTPClient{
-		Resp: &http.Response{
-			StatusCode: http.StatusOK,
-		},
-	}
-
-	expectedHeaders := map[string]string{
-		"Auth": "/app/json",
-	}
-
-	url := "foo"
-
-	_, err := call(url, http.MethodPost, nil, &m, expectedHeaders)
-	odize.AssertNoError(t, err)
-	for key, value := range expectedHeaders {
-		odize.AssertEqual(t, m.Req.Header.Get(key), value)
-	}
-	odize.AssertEqual(t, m.Req.URL.String(), url)
-	odize.AssertEqual(t, m.Req.Method, http.MethodPost)
-
-}
-
-func Test_call_POST_4xx_should_return_error(t *testing.T) {
-	m := MockHTTPClient{
-		Resp: &http.Response{
-			StatusCode: http.StatusBadRequest,
-		},
-	}
-
-	expectedHeaders := map[string]string{
-		"Auth": "/app/json",
-	}
-
-	url := "foo"
-
-	var expectedErr *APIError
-
-	_, err := call(url, http.MethodPost, nil, &m, expectedHeaders)
-	if err == nil {
-		t.Error("expected error, got none")
-		return
-	}
-	odize.AssertTrue(t, errors.As(err, &expectedErr))
-}
-
-func Test_call_POST_5xx_should_return_error(t *testing.T) {
-	m := MockHTTPClient{
-		Resp: &http.Response{
-			StatusCode: http.StatusInternalServerError,
-		},
-	}
-
-	expectedHeaders := map[string]string{
-		"Auth": "/app/json",
-	}
-
-	url := "foo"
-
-	var expectedErr *APIError
-
-	_, err := call(url, http.MethodPost, nil, &m, expectedHeaders)
-	if err == nil {
-		t.Error("expected error, got none")
-		return
-	}
-	odize.AssertTrue(t, errors.As(err, &expectedErr))
-}
-
-func Test_call_GET_should_not_return_error_and_match_req(t *testing.T) {
-	m := MockHTTPClient{
-		Resp: &http.Response{
-			StatusCode: http.StatusOK,
-		},
-	}
-
-	expectedHeaders := map[string]string{
-		"Auth": "/app/json",
-	}
-
-	url := "foo"
-
-	_, err := call(url, http.MethodGet, nil, &m, expectedHeaders)
-	odize.AssertNoError(t, err)
-	for key, value := range expectedHeaders {
-		odize.AssertEqual(t, m.Req.Header.Get(key), value)
-	}
-	odize.AssertEqual(t, m.Req.URL.String(), url)
-	odize.AssertEqual(t, m.Req.Method, http.MethodGet)
-
-}
-func Test_call_PUT_should_not_return_error_and_match_req(t *testing.T) {
-	m := MockHTTPClient{
-		Resp: &http.Response{
-			StatusCode: http.StatusOK,
-		},
-	}
-
-	expectedHeaders := map[string]string{
-		"Auth": "/app/json",
-	}
-
-	url := "foo"
-
-	_, err := call(url, http.MethodPut, nil, &m, expectedHeaders)
-	odize.AssertNoError(t, err)
-	for key, value := range expectedHeaders {
-		odize.AssertEqual(t, m.Req.Header.Get(key), value)
-	}
-	odize.AssertEqual(t, m.Req.URL.String(), url)
-	odize.AssertEqual(t, m.Req.Method, http.MethodPut)
-
-}
-
-func Test_call_PATCH_should_not_return_error_and_match_req(t *testing.T) {
-	m := MockHTTPClient{
-		Resp: &http.Response{
-			StatusCode: http.StatusOK,
-		},
-	}
-
-	expectedHeaders := map[string]string{
-		"Auth": "/app/json",
-	}
-
-	url := "foo"
-
-	_, err := call(url, http.MethodPatch, nil, &m, expectedHeaders)
-	odize.AssertNoError(t, err)
-	for key, value := range expectedHeaders {
-		odize.AssertEqual(t, m.Req.Header.Get(key), value)
-	}
-	odize.AssertEqual(t, m.Req.URL.String(), url)
-	odize.AssertEqual(t, m.Req.Method, http.MethodPatch)
-
-}
-
-func Test_call_DELETE_should_not_return_error_and_match_req(t *testing.T) {
-	m := MockHTTPClient{
-		Resp: &http.Response{
-			StatusCode: http.StatusOK,
-		},
-	}
-
-	expectedHeaders := map[string]string{
-		"Auth": "/app/json",
-	}
-
-	url := "foo"
-
-	_, err := call(url, http.MethodDelete, nil, &m, expectedHeaders)
-	odize.AssertNoError(t, err)
-	for key, value := range expectedHeaders {
-		odize.AssertEqual(t, m.Req.Header.Get(key), value)
-	}
-	odize.AssertEqual(t, m.Req.URL.String(), url)
-	odize.AssertEqual(t, m.Req.Method, http.MethodDelete)
-
-}
-
-func Test_call_body_should_match(t *testing.T) {
-	m := MockHTTPClient{}
-
-	body := map[string]string{
-		"slap": "foo",
-	}
-
-	data, err := json.Marshal(&body)
-	odize.AssertNoError(t, err)
-
-	url := "foo"
-
-	_, err = call(url, http.MethodPost, bytes.NewReader(data), &m, body)
-	odize.AssertNoError(t, err)
-
-	test := map[string]string{}
-	err = json.NewDecoder(m.Req.Body).Decode(&test)
-	odize.AssertNoError(t, err)
-	odize.AssertEqual(t, test, body)
-
-}
-
-func Test_call_should_should_return_error(t *testing.T) {
-	m := MockHTTPClient{
-		ErrDo: true,
-		Err:   errors.New("expected error"),
-	}
-
-	expectedHeaders := map[string]string{
-		"Auth": "/app/json",
-	}
-
-	url := "foo"
-
-	_, err := call(url, http.MethodPost, nil, &m, expectedHeaders)
-	odize.AssertTrue(t, errors.Is(err, m.Err))
-}
-
-func Test_callWithRetry_client_error_should_return_error(t *testing.T) {
-	m := MockHTTPClient{
-		ErrDo: true,
-		Err:   errors.New("expected error"),
-	}
-
-	_, err := callWithRetry("", http.MethodPost, nil, &m, []time.Duration{1 * time.Nanosecond})
-	odize.AssertTrue(t, errors.Is(err, m.Err))
-}
-
-func Test_callWithRetry_4xx_client_error_should_return_error(t *testing.T) {
-	m := MockHTTPClient{
-		Resp: &http.Response{
-			StatusCode: http.StatusBadRequest,
-		},
-	}
-	var apiErr *APIError
-	_, err := callWithRetry("", http.MethodPost, nil, &m, []time.Duration{1 * time.Nanosecond})
-	odize.AssertTrue(t, errors.As(err, &apiErr))
-	odize.AssertEqual(t, 1, m.Retries)
-}
-
-func Test_callWithRetry_5xx_client_error_retry_and_should_return_error(t *testing.T) {
-	m := MockHTTPClient{
-		Resp: &http.Response{
-			StatusCode: http.StatusInternalServerError,
-		},
-	}
-	var apiErr *APIError
-	_, err := callWithRetry("", http.MethodPost, nil, &m, []time.Duration{1 * time.Nanosecond, 1 * time.Nanosecond})
-
-	odize.AssertTrue(t, errors.As(err, &apiErr))
-	odize.AssertEqual(t, 2, m.Retries)
-}
-
-func Test_callWithRetry_no_retries_should_return_error(t *testing.T) {
-	m := MockHTTPClient{
-		ErrDo: true,
-		Err:   errors.New("not expected error"),
-	}
-
-	_, err := callWithRetry("", http.MethodPost, nil, &m, []time.Duration{})
-	odize.AssertTrue(t, errors.Is(err, ErrNoValidRetryStrategy))
-}
-
-func Test_callWithRetry_nill_retries_should_return_error(t *testing.T) {
-	m := MockHTTPClient{
-		ErrDo: true,
-		Err:   errors.New("not expected error"),
-	}
-
-	_, err := callWithRetry("", http.MethodPost, nil, &m, nil)
-	odize.AssertTrue(t, errors.Is(err, ErrNoValidRetryStrategy))
-}
-
-func Test_callWithRetry_should_return_response(t *testing.T) {
-	m := MockHTTPClient{
-		Resp: &http.Response{
-			Status:     http.StatusText(http.StatusOK),
-			StatusCode: http.StatusOK,
-		},
-	}
-
-	resp, err := callWithRetry("", http.MethodGet, nil, &m, []time.Duration{1 * time.Nanosecond})
-	odize.AssertNoError(t, err)
-	odize.AssertEqual(t, resp, m.Resp)
-	odize.AssertEqual(t, m.Req.Method, http.MethodGet)
-}
-
-func TestAxios_Patch_no_retry(t *testing.T) {
+func TestClient_Patch_no_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
 			Status:     http.StatusText(http.StatusOK),
@@ -294,18 +27,18 @@ func TestAxios_Patch_no_retry(t *testing.T) {
 		"default-header": "bar",
 	}
 
-	axios := &Client{
+	c := &Client{
 		RetryStrategy:  nil,
 		Client:         &m,
 		DefaultHeaders: defaultHeaders,
 	}
 
-	resp, err := axios.Patch("", bytes.NewReader(nil), headers)
+	resp, err := c.Patch("", bytes.NewReader(nil), headers)
 	odize.AssertNoError(t, err)
 	odize.AssertEqual(t, resp, m.Resp)
 }
 
-func TestAxios_Patch_no_retry_with_default_and_normal_headers(t *testing.T) {
+func TestClient_Patch_no_retry_with_default_and_normal_headers(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
 			Status:     http.StatusText(http.StatusOK),
@@ -321,13 +54,13 @@ func TestAxios_Patch_no_retry_with_default_and_normal_headers(t *testing.T) {
 		"default-header": "bar",
 	}
 
-	axios := &Client{
+	c := &Client{
 		RetryStrategy:  nil,
 		Client:         &m,
 		DefaultHeaders: defaultHeaders,
 	}
 
-	resp, err := axios.Patch("", bytes.NewReader(nil), headers)
+	resp, err := c.Patch("", bytes.NewReader(nil), headers)
 	odize.AssertNoError(t, err)
 	odize.AssertEqual(t, resp, m.Resp)
 	for key, value := range defaultHeaders {
@@ -338,7 +71,7 @@ func TestAxios_Patch_no_retry_with_default_and_normal_headers(t *testing.T) {
 	}
 }
 
-func TestAxios_Patch_with_retry(t *testing.T) {
+func TestClient_Patch_with_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
 			Status:     http.StatusText(http.StatusOK),
@@ -350,17 +83,17 @@ func TestAxios_Patch_with_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Client{
+	c := &Client{
 		RetryStrategy: []time.Duration{1 * time.Nanosecond},
 		Client:        &m,
 	}
 
-	resp, err := axios.Patch("", bytes.NewReader(nil), headers)
+	resp, err := c.Patch("", bytes.NewReader(nil), headers)
 	odize.AssertNoError(t, err)
 	odize.AssertEqual(t, resp, m.Resp)
 }
 
-func TestAxios_Delete_no_retry(t *testing.T) {
+func TestClient_Delete_no_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
 			Status:     http.StatusText(http.StatusOK),
@@ -372,17 +105,17 @@ func TestAxios_Delete_no_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Client{
+	c := &Client{
 		RetryStrategy: nil,
 		Client:        &m,
 	}
 
-	resp, err := axios.Delete("", bytes.NewReader(nil), headers)
+	resp, err := c.Delete("", bytes.NewReader(nil), headers)
 	odize.AssertNoError(t, err)
 	odize.AssertEqual(t, resp, m.Resp)
 }
 
-func TestAxios_Delete_with_retry(t *testing.T) {
+func TestClient_Delete_with_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
 			Status:     http.StatusText(http.StatusOK),
@@ -394,17 +127,17 @@ func TestAxios_Delete_with_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Client{
+	c := &Client{
 		RetryStrategy: []time.Duration{1 * time.Nanosecond},
 		Client:        &m,
 	}
 
-	resp, err := axios.Delete("", bytes.NewReader(nil), headers)
+	resp, err := c.Delete("", bytes.NewReader(nil), headers)
 	odize.AssertNoError(t, err)
 	odize.AssertEqual(t, resp, m.Resp)
 }
 
-func TestAxios_Delete_with_retry_with_default_and_normal_headers(t *testing.T) {
+func TestClient_Delete_with_retry_with_default_and_normal_headers(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
 			Status:     http.StatusText(http.StatusOK),
@@ -420,13 +153,13 @@ func TestAxios_Delete_with_retry_with_default_and_normal_headers(t *testing.T) {
 		"default-header": "bar",
 	}
 
-	axios := &Client{
+	c := &Client{
 		RetryStrategy:  nil,
 		Client:         &m,
 		DefaultHeaders: defaultHeaders,
 	}
 
-	resp, err := axios.Delete("", bytes.NewReader(nil), headers)
+	resp, err := c.Delete("", bytes.NewReader(nil), headers)
 	odize.AssertNoError(t, err)
 	odize.AssertEqual(t, resp, m.Resp)
 	for key, value := range defaultHeaders {
@@ -437,7 +170,7 @@ func TestAxios_Delete_with_retry_with_default_and_normal_headers(t *testing.T) {
 	}
 }
 
-func TestAxios_Put_no_retry(t *testing.T) {
+func TestClient_Put_no_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
 			Status:     http.StatusText(http.StatusOK),
@@ -449,17 +182,17 @@ func TestAxios_Put_no_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Client{
+	c := &Client{
 		RetryStrategy: nil,
 		Client:        &m,
 	}
 
-	resp, err := axios.Put("", bytes.NewReader(nil), headers)
+	resp, err := c.Put("", bytes.NewReader(nil), headers)
 	odize.AssertNoError(t, err)
 	odize.AssertEqual(t, resp, m.Resp)
 }
 
-func TestAxios_Put_with_retry(t *testing.T) {
+func TestClient_Put_with_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
 			Status:     http.StatusText(http.StatusOK),
@@ -471,17 +204,17 @@ func TestAxios_Put_with_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Client{
+	c := &Client{
 		RetryStrategy: []time.Duration{1 * time.Nanosecond},
 		Client:        &m,
 	}
 
-	resp, err := axios.Put("", bytes.NewReader(nil), headers)
+	resp, err := c.Put("", bytes.NewReader(nil), headers)
 	odize.AssertNoError(t, err)
 	odize.AssertEqual(t, resp, m.Resp)
 }
 
-func TestAxios_Put_with_retry_with_default_and_normal_headers(t *testing.T) {
+func TestClient_Put_with_retry_with_default_and_normal_headers(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
 			Status:     http.StatusText(http.StatusOK),
@@ -497,13 +230,13 @@ func TestAxios_Put_with_retry_with_default_and_normal_headers(t *testing.T) {
 		"default-header": "bar",
 	}
 
-	axios := &Client{
+	c := &Client{
 		RetryStrategy:  nil,
 		Client:         &m,
 		DefaultHeaders: defaultHeaders,
 	}
 
-	resp, err := axios.Put("", bytes.NewReader(nil), headers)
+	resp, err := c.Put("", bytes.NewReader(nil), headers)
 	odize.AssertNoError(t, err)
 	odize.AssertEqual(t, resp, m.Resp)
 	for key, value := range defaultHeaders {
@@ -514,7 +247,7 @@ func TestAxios_Put_with_retry_with_default_and_normal_headers(t *testing.T) {
 	}
 }
 
-func TestAxios_Get_with_retry(t *testing.T) {
+func TestClient_Get_with_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
 			Status:     http.StatusText(http.StatusOK),
@@ -526,16 +259,16 @@ func TestAxios_Get_with_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Client{
+	c := &Client{
 		RetryStrategy: []time.Duration{1 * time.Nanosecond},
 		Client:        &m,
 	}
 
-	resp, err := axios.Get("", headers)
+	resp, err := c.Get("", headers)
 	odize.AssertNoError(t, err)
 	odize.AssertEqual(t, resp, m.Resp)
 }
-func TestAxios_Get_no_retry(t *testing.T) {
+func TestClient_Get_no_retry(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
 			Status:     http.StatusText(http.StatusOK),
@@ -547,17 +280,17 @@ func TestAxios_Get_no_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Client{
+	c := &Client{
 		RetryStrategy: nil,
 		Client:        &m,
 	}
 
-	resp, err := axios.Get("", headers)
+	resp, err := c.Get("", headers)
 	odize.AssertNoError(t, err)
 	odize.AssertEqual(t, resp, m.Resp)
 }
 
-func TestAxios_Get_no_retry_with_default_and_normal_headers(t *testing.T) {
+func TestClient_Get_no_retry_with_default_and_normal_headers(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
 			Status:     http.StatusText(http.StatusOK),
@@ -573,13 +306,13 @@ func TestAxios_Get_no_retry_with_default_and_normal_headers(t *testing.T) {
 		"default-header": "bar",
 	}
 
-	axios := &Client{
+	c := &Client{
 		RetryStrategy:  nil,
 		Client:         &m,
 		DefaultHeaders: defaultHeaders,
 	}
 
-	resp, err := axios.Get("", headers)
+	resp, err := c.Get("", headers)
 	odize.AssertNoError(t, err)
 	odize.AssertEqual(t, resp, m.Resp)
 	for key, value := range defaultHeaders {
@@ -590,7 +323,7 @@ func TestAxios_Get_no_retry_with_default_and_normal_headers(t *testing.T) {
 	}
 }
 
-func TestAxios_Post_with_retry(t *testing.T) {
+func TestClient_Post_with_retry_response_status_ok(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
 			Status:     http.StatusText(http.StatusOK),
@@ -602,17 +335,17 @@ func TestAxios_Post_with_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Client{
+	c := &Client{
 		RetryStrategy: []time.Duration{1 * time.Nanosecond},
 		Client:        &m,
 	}
 
-	resp, err := axios.Post("", bytes.NewReader(nil), headers)
+	resp, err := c.Post("", bytes.NewReader(nil), headers)
 	odize.AssertNoError(t, err)
 	odize.AssertEqual(t, resp, m.Resp)
 }
 
-func TestAxios_Post_no_retry(t *testing.T) {
+func TestClient_Post_with_retry_response_should_try_once(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
 			Status:     http.StatusText(http.StatusOK),
@@ -624,17 +357,80 @@ func TestAxios_Post_no_retry(t *testing.T) {
 		"Content-Type": "application/json",
 	}
 
-	axios := &Client{
+	c := &Client{
+		RetryStrategy: []time.Duration{1 * time.Nanosecond},
+		Client:        &m,
+	}
+
+	_, _ = c.Post("", bytes.NewReader(nil), headers)
+	odize.AssertEqual(t, m.Retries, 1)
+}
+
+func TestClient_Post_with_retry_response_should_try_twice(t *testing.T) {
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			Status:     http.StatusText(http.StatusGatewayTimeout),
+			StatusCode: http.StatusGatewayTimeout,
+		},
+	}
+
+	headers := map[string]string{
+		"Content-Type": "application/json",
+	}
+
+	c := &Client{
+		RetryStrategy: []time.Duration{1 * time.Nanosecond, 1 * time.Nanosecond},
+		Client:        &m,
+	}
+
+	_, _ = c.Post("", bytes.NewReader(nil), headers)
+	odize.AssertEqual(t, m.Retries, 2)
+}
+
+func TestClient_Post_no_retry(t *testing.T) {
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
+		},
+	}
+
+	headers := map[string]string{
+		"Content-Type": "application/json",
+	}
+
+	c := &Client{
 		RetryStrategy: nil,
 		Client:        &m,
 	}
 
-	resp, err := axios.Post("", bytes.NewReader(nil), headers)
+	resp, err := c.Post("", bytes.NewReader(nil), headers)
 	odize.AssertNoError(t, err)
 	odize.AssertEqual(t, resp, m.Resp)
 }
 
-func TestAxios_Post_no_retry_with_default_and_normal_headers(t *testing.T) {
+func TestClient_Post_empty_retry_list(t *testing.T) {
+	m := MockHTTPClient{
+		Resp: &http.Response{
+			Status:     http.StatusText(http.StatusOK),
+			StatusCode: http.StatusOK,
+		},
+	}
+
+	headers := map[string]string{
+		"Content-Type": "application/json",
+	}
+
+	c := &Client{
+		RetryStrategy: []time.Duration{},
+		Client:        &m,
+	}
+
+	_, err := c.Post("", bytes.NewReader(nil), headers)
+	odize.AssertError(t, err)
+}
+
+func TestClient_Post_no_retry_with_default_and_normal_headers(t *testing.T) {
 	m := MockHTTPClient{
 		Resp: &http.Response{
 			Status:     http.StatusText(http.StatusOK),
@@ -650,13 +446,13 @@ func TestAxios_Post_no_retry_with_default_and_normal_headers(t *testing.T) {
 		"default-header": "bar",
 	}
 
-	axios := &Client{
+	c := &Client{
 		RetryStrategy:  nil,
 		Client:         &m,
 		DefaultHeaders: defaultHeaders,
 	}
 
-	resp, err := axios.Post("", bytes.NewReader(nil), headers)
+	resp, err := c.Post("", bytes.NewReader(nil), headers)
 	odize.AssertNoError(t, err)
 	odize.AssertEqual(t, resp, m.Resp)
 	for key, value := range defaultHeaders {
@@ -668,21 +464,21 @@ func TestAxios_Post_no_retry_with_default_and_normal_headers(t *testing.T) {
 }
 
 func TestNew_with_default_retry(t *testing.T) {
-	axios := New(nil)
-	odize.AssertEqual(t, axios.RetryStrategy, setDefaultFetch().RetryStrategy)
+	c := New(nil)
+	odize.AssertEqual(t, c.RetryStrategy, setDefaultFetch().RetryStrategy)
 }
 
 func TestNew_with_default_header(t *testing.T) {
-	axios := New(nil)
-	odize.AssertEqual(t, axios.DefaultHeaders, setDefaultFetch().DefaultHeaders)
+	c := New(nil)
+	odize.AssertEqual(t, c.DefaultHeaders, setDefaultFetch().DefaultHeaders)
 }
 
 func TestNew_with_functional_options(t *testing.T) {
 	expected := []time.Duration{1, 2}
-	axios := New(WithOpts(
+	c := New(WithOpts(
 		WithRetryStrategy(&expected),
 	))
-	odize.AssertEqual(t, axios.RetryStrategy, expected)
+	odize.AssertEqual(t, c.RetryStrategy, expected)
 }
 
 func TestNew_with_options_headers(t *testing.T) {
@@ -692,8 +488,8 @@ func TestNew_with_options_headers(t *testing.T) {
 			"foo": "bar",
 		},
 	}
-	axios := New(&options)
-	odize.AssertEqual(t, axios.DefaultHeaders, options.DefaultHeaders)
+	c := New(&options)
+	odize.AssertEqual(t, c.DefaultHeaders, options.DefaultHeaders)
 }
 
 func TestNew_with_options_no_retry(t *testing.T) {
@@ -703,15 +499,15 @@ func TestNew_with_options_no_retry(t *testing.T) {
 			"foo": "bar",
 		},
 	}
-	axios := New(&options)
-	odize.AssertEqual(t, axios.RetryStrategy, []time.Duration(nil))
+	c := New(&options)
+	odize.AssertEqual(t, c.RetryStrategy, []time.Duration(nil))
 }
 func TestNew_with_options_with_retry(t *testing.T) {
 	options := Options{
 		WithRetry: true,
 	}
-	axios := New(&options)
-	odize.AssertEqual(t, axios.RetryStrategy, setDefaultRetryStrategy())
+	c := New(&options)
+	odize.AssertEqual(t, c.RetryStrategy, setDefaultRetryStrategy())
 }
 
 func Test_mergeHeaders_should_merge_correctly(t *testing.T) {
@@ -731,4 +527,92 @@ func Test_mergeHeaders_empty_should_work(t *testing.T) {
 	test := mergeHeaders()
 
 	odize.AssertEqual(t, expected, test)
+}
+
+func TestClient_context_methods(t *testing.T) {
+	group := odize.NewGroup(t, nil)
+
+	var c Client
+	var mock *MockHTTPClient
+	var ctx context.Context
+	var cancelFunc context.CancelFunc
+
+	group.BeforeEach(func() {
+		ctx, cancelFunc = context.WithTimeout(context.Background(), 1*time.Nanosecond)
+
+		mock = &MockHTTPClient{
+			Err:   context.Canceled,
+			ErrDo: true,
+			Resp: &http.Response{
+				Status:     http.StatusText(http.StatusOK),
+				StatusCode: http.StatusOK,
+			},
+		}
+
+		c = Client{Client: mock}
+	})
+
+	err := group.
+		Test("GetCtx cancel() should return error", func(t *testing.T) {
+
+			c = Client{
+				Client: mock,
+			}
+
+			cancelFunc()
+
+			_, err := c.GetCtx(ctx, "/https://google.com", nil)
+			odize.AssertTrue(t, errors.Is(err, context.Canceled))
+
+		}).
+		Test("PostCtx cancel() should return error", func(t *testing.T) {
+
+			c = Client{
+				Client: mock,
+			}
+
+			cancelFunc()
+
+			_, err := c.PostCtx(ctx, "/https://google.com", bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
+			odize.AssertTrue(t, errors.Is(err, context.Canceled))
+
+		}).
+		Test("PutCtx cancel() should return error", func(t *testing.T) {
+
+			c = Client{
+				Client: mock,
+			}
+
+			cancelFunc()
+
+			_, err := c.PutCtx(ctx, "/https://google.com", bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
+			odize.AssertTrue(t, errors.Is(err, context.Canceled))
+
+		}).
+		Test("DeleteCtx cancel() should return error", func(t *testing.T) {
+
+			c = Client{
+				Client: mock,
+			}
+
+			cancelFunc()
+
+			_, err := c.DeleteCtx(ctx, "/https://google.com", bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
+			odize.AssertTrue(t, errors.Is(err, context.Canceled))
+
+		}).
+		Test("PatchCtx cancel() should return error", func(t *testing.T) {
+
+			c = Client{
+				Client: mock,
+			}
+
+			cancelFunc()
+
+			_, err := c.PatchCtx(ctx, "/https://google.com", bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
+			odize.AssertTrue(t, errors.Is(err, context.Canceled))
+
+		}).
+		Run()
+	odize.AssertNoError(t, err)
 }

@@ -5,7 +5,16 @@ updates:
     directory: /
     schedule:
       interval: monthly
-  - directory: github
-    package-ecosystem: github-actions
+    groups:
+      prod:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: monthly
+      interval: "monthly"
+    groups:
+      prod:
+        patterns:
+          - "*"

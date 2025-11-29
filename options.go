@@ -36,7 +36,7 @@ func WithOpts(opts ...FnOpts) *Options {
 	return &o
 }
 
-// WithDefaultRetry - use client default retry strategy
+// WithDefaultRetryStrategy - use client default retry strategy
 func WithDefaultRetryStrategy() FnOpts {
 	return func(o *Options) error {
 		o.WithRetry = true

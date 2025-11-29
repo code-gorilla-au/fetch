@@ -1,14 +1,16 @@
+// Package fetch provides a simple fetch client with built in backup / retry strategy.
 package fetch
 
 import (
+	"context"
 	"errors"
-	"fmt"
 	"io"
+	"log"
 	"net/http"
-	"sync"
 	"time"
 )
 
+// New initialises and returns a new Client instance with the provided options or default configurations if nil.
 func New(options *Options) *Client {
 
 	if options == nil {
@@ -35,67 +37,240 @@ func New(options *Options) *Client {
 	return &fetch
 }
 
+// Get sends an HTTP GET request to the specified URL with optional headers and returns the HTTP response or an error.
+//
+// Example:
+//
+//	var apiErr *fetch.APIError
+//
+//	resp, err := client.Get(url, nil)
+//	if err != nil {
+//		if errors.As(err, &apiErr) {
+//			fmt.Println("API Response error", apiErr)
+//		}
+//		// Handle non-API Error
+//	}
 func (a *Client) Get(url string, headers map[string]string) (*http.Response, error) {
-	return a.do(url, http.MethodGet, nil, headers)
+	ctx := context.Background()
+	return a.do(ctx, url, http.MethodGet, nil, headers)
 }
 
+// Post sends an HTTP POST request to the specified URL with a body and optional headers, returning the HTTP response or an error.
+//
+// Example:
+//
+//	var apiErr *fetch.APIError
+//
+//	resp, err := client.Post(url, bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
+//	if err != nil {
+//		if errors.As(err, &apiErr) {
+//			fmt.Println("API Response error", apiErr)
+//		}
+//		// Handle non-API Error
+//	}
 func (a *Client) Post(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
-	return a.do(url, http.MethodPost, body, headers)
+	ctx := context.Background()
+	return a.do(ctx, url, http.MethodPost, body, headers)
 }
 
+// Put sends an HTTP PUT request to the specified URL with a body and optional headers, returning the HTTP response or an error.
+//
+// Example:
+//
+//	var apiErr *fetch.APIError
+//
+//	resp, err := client.Put(url, bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
+//	if err != nil {
+//		if errors.As(err, &apiErr) {
+//			fmt.Println("API Response error", apiErr)
+//		}
+//		// Handle non-API Error
+//	}
 func (a *Client) Put(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
-	return a.do(url, http.MethodPut, body, headers)
+	ctx := context.Background()
+	return a.do(ctx, url, http.MethodPut, body, headers)
 }
 
+// Delete sends an HTTP DELETE request to the specified URL with a body and optional headers, returning the response or an error.
+//
+// Example:
+//
+//	var apiErr *fetch.APIError
+//
+//	resp, err := client.Delete(url, bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
+//	if err != nil {
+//		if errors.As(err, &apiErr) {
+//			fmt.Println("API Response error", apiErr)
+//		}
+//		// Handle non-API Error
+//	}
 func (a *Client) Delete(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
-	return a.do(url, http.MethodDelete, body, headers)
+	ctx := context.Background()
+	return a.do(ctx, url, http.MethodDelete, body, headers)
 }
 
+// Patch sends an HTTP PATCH request to the specified URL with a body and optional headers, returning the response or an error.
+// Example:
+//
+//	var apiErr *fetch.APIError
+//
+//	resp, err := client.Patch(url, bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
+//	if err != nil {
+//		if errors.As(err, &apiErr) {
+//			fmt.Println("API Response error", apiErr)
+//		}
+//		// Handle non-API Error
+//	}
 func (a *Client) Patch(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
-	return a.do(url, http.MethodPatch, body, headers)
+	ctx := context.Background()
+	return a.do(ctx, url, http.MethodPatch, body, headers)
 }
 
-// do - make http call with provided configuration
-func (a *Client) do(url string, method string, body io.Reader, headers map[string]string) (*http.Response, error) {
+// GetCtx sends a cancelable HTTP GET request to the specified URL with context and optional headers, returning the response or an error.
+//
+// Example:
+//
+//	var apiErr *fetch.APIError
+//	ctx, cancel := context.WithCancel(context.Background())
+//
+//	resp, err := client.GetCtx(ctx,url, nil)
+//	if err != nil {
+//		if errors.is(err, context.Canceled) {
+//			// Handle context cancelled
+//		}
+//		if errors.As(err, &apiErr) {
+//			fmt.Println("API Response error", apiErr)
+//		}
+//		// Handle non-API Error
+//	}
+func (a *Client) GetCtx(ctx context.Context, url string, headers map[string]string) (*http.Response, error) {
+	return a.do(ctx, url, http.MethodGet, nil, headers)
+}
+
+// PostCtx sends a cancelable HTTP POST request to the specified URL with context, body, and headers, returning a response or error.
+//
+// Example:
+//
+//	var apiErr *fetch.APIError
+//	ctx, cancel := context.WithCancel(context.Background())
+//
+//	resp, err := client.PostCtx(ctx,url, bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
+//	if err != nil {
+//		if errors.is(err, context.Canceled) {
+//			// Handle context cancelled
+//		}
+//		if errors.As(err, &apiErr) {
+//			fmt.Println("API Response error", apiErr)
+//		}
+//		// Handle non-API Error
+//	}
+func (a *Client) PostCtx(ctx context.Context, url string, body io.Reader, headers map[string]string) (*http.Response, error) {
+	return a.do(ctx, url, http.MethodPost, body, headers)
+}
+
+// PutCtx sends a cancelable HTTP PUT request to the specified URL with context, body, and headers, returning a response or error.
+//
+// Example:
+//
+//	var apiErr *fetch.APIError
+//	ctx, cancel := context.WithCancel(context.Background())
+//
+//	resp, err := client.PutCtx(ctx,url, bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
+//	if err != nil {
+//		if errors.is(err, context.Canceled) {
+//			// Handle context cancelled
+//		}
+//		if errors.As(err, &apiErr) {
+//			fmt.Println("API Response error", apiErr)
+//		}
+//		// Handle non-API Error
+//	}
+func (a *Client) PutCtx(ctx context.Context, url string, body io.Reader, headers map[string]string) (*http.Response, error) {
+	return a.do(ctx, url, http.MethodPut, body, headers)
+}
+
+// DeleteCtx sends a cancelable HTTP DELETE request to the specified URL with context, body, and headers, returning a response or error.
+//
+// Example:
+//
+//	var apiErr *fetch.APIError
+//	ctx, cancel := context.WithCancel(context.Background())
+//
+//	resp, err := client.DeleteCtx(ctx,url, bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
+//	if err != nil {
+//		if errors.is(err, context.Canceled) {
+//			// Handle context cancelled
+//		}
+//		if errors.As(err, &apiErr) {
+//			fmt.Println("API Response error", apiErr)
+//		}
+//		// Handle non-API Error
+//	}
+func (a *Client) DeleteCtx(ctx context.Context, url string, body io.Reader, headers map[string]string) (*http.Response, error) {
+	return a.do(ctx, url, http.MethodDelete, body, headers)
+}
+
+// PatchCtx sends an HTTP PATCH request to the specified URL with the provided context, body, and headers.
+//
+// Example:
+//
+//	var apiErr *fetch.APIError
+//	ctx, cancel := context.WithCancel(context.Background())
+//
+//	resp, err := client.PatchCtx(ctx,url, bytes.NewReader([]byte(`{"hello": "world"}`)), nil)
+//	if err != nil {
+//		if errors.is(err, context.Canceled) {
+//			// Handle context cancelled
+//		}
+//		if errors.As(err, &apiErr) {
+//			fmt.Println("API Response error", apiErr)
+//		}
+//		// Handle non-API Error
+//	}
+func (a *Client) PatchCtx(ctx context.Context, url string, body io.Reader, headers map[string]string) (*http.Response, error) {
+	return a.do(ctx, url, http.MethodPatch, body, headers)
+}
+
+// do - make http call with the provided configuration
+func (a *Client) do(ctx context.Context, url string, method string, body io.Reader, headers map[string]string) (*http.Response, error) {
 	if a.RetryStrategy == nil {
-		return call(url, method, body, a.Client, headers, a.DefaultHeaders)
+		return a.call(ctx, url, method, body, headers, a.DefaultHeaders)
 	}
-	return callWithRetry(url, method, body, a.Client, a.RetryStrategy, headers, a.DefaultHeaders)
+
+	return a.callWithRetry(ctx, url, method, body, headers, a.DefaultHeaders)
 }
 
 // callWithRetry - wrap the call method with the retry strategy
-func callWithRetry(url string, method string, body io.Reader, client httpClient, retryStrategy []time.Duration, headers ...map[string]string) (*http.Response, error) {
+func (a *Client) callWithRetry(ctx context.Context, url string, method string, body io.Reader, headers ...map[string]string) (*http.Response, error) {
 	logPrefix := "fetch: callWithRetry"
 	var resp *http.Response
 	var err error
 
-	if len(retryStrategy) == 0 {
+	if len(a.RetryStrategy) == 0 {
 		return resp, ErrNoValidRetryStrategy
 	}
 
-	waitGroup := sync.WaitGroup{}
-	waitGroup.Add(1)
+	for _, retryWait := range a.RetryStrategy {
+		resp, err = a.call(ctx, url, method, body, headers...)
 
-	go func() {
-		for _, retryWait := range retryStrategy {
-			resp, err = call(url, method, body, client, headers...)
-			if err == nil || !isRecoverable(err) {
-				break
+		if err == nil || !isRecoverable(err) {
+			if errors.Is(err, context.Canceled) {
+				log.Printf("%s: http %s request canceled", logPrefix, method)
 			}
 
-			fmt.Printf("%s: http %s request error [%s], will retry in [%s]", logPrefix, method, err, retryWait)
-			time.Sleep(retryWait)
+			break
 		}
-		waitGroup.Done()
-	}()
 
-	waitGroup.Wait()
+		log.Printf("%s: http %s request error [%s], will retry in [%s]", logPrefix, method, err, retryWait)
+		time.Sleep(retryWait)
+	}
+
 	return resp, err
 }
 
 // call - creates a new HTTP request and returns an HTTP response
-func call(url string, method string, body io.Reader, client httpClient, headers ...map[string]string) (*http.Response, error) {
-	req, err := http.NewRequest(method, url, body)
+func (a *Client) call(ctx context.Context, url string, method string, body io.Reader, headers ...map[string]string) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
 		return &http.Response{}, err
 	}
@@ -105,7 +280,9 @@ func call(url string, method string, body io.Reader, client httpClient, headers 
 		req.Header.Add(key, value)
 	}
 
-	resp, err := client.Do(req)
+	log.Println("request", req == nil)
+
+	resp, err := a.Client.Do(req)
 	if err != nil {
 		return resp, err
 	}

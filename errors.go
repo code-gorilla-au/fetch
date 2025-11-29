@@ -16,7 +16,7 @@ type APIError struct {
 }
 
 func (e *APIError) Error() string {
-	return fmt.Sprintf("%s [%d]: %s", e.StatusText, e.StatusCode, e.Message)
+	return fmt.Sprintf("%s: [%d]: %s", e.StatusText, e.StatusCode, e.Message)
 }
 
 func (e *APIError) Unwrap() error {
