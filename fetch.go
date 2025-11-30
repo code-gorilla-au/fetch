@@ -1,4 +1,5 @@
-// Package fetch provides a simple fetch client with built in backup / retry strategy.
+// Package fetch provides a simple fetch client with a built-in backup / retry strategy.
+// Provides a interface for cancelable HTTP requests.
 package fetch
 
 import (
