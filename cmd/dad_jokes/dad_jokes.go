@@ -20,18 +20,19 @@ func main() {
 
 	client := fetch.New(&opts)
 
-	var apiErr *fetch.APIError
 	resp, err := client.Get(url, nil)
 	if err != nil {
-		if errors.As(err, &apiErr) {
+		if apiErr, ok := errors.AsType[*fetch.APIError](err); ok {
 			fmt.Println("API Response error", apiErr)
 			os.Exit(1)
 		}
+
 		fmt.Println("Client Error", err)
 		os.Exit(1)
 	}
+
 	joke := dadJoke{}
-	if err := json.NewDecoder(resp.Body).Decode(&joke); err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(&joke); err != nil {
 		fmt.Println("json decode error ", err)
 		os.Exit(1)
 	}
@@ -44,7 +45,7 @@ type dadJoke struct {
 	Status int    `json:"status,omitempty"`
 }
 
-func prettyPrintJson(v interface{}) {
+func prettyPrintJson(v any) {
 	data, _ := json.MarshalIndent(v, "", "    ")
 	fmt.Println(string(data))
 }
